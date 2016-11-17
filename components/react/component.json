@@ -1,0 +1,14 @@
+{
+    "name": "react",
+    "description": "React is a JavaScript library for building user interfaces.",
+    "repos": "https://github.com/facebook/react.git",
+    "main": "react",
+    "tag": "master",
+    "reposType": "npm",
+    "dependencies": {},
+    "hook": ".hook.js",
+    "paths": {
+        "dist": "."
+    },
+    "version": "15.1.0"
+}

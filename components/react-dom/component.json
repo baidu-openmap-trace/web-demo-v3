@@ -1,0 +1,15 @@
+{
+    "name": "react-dom",
+    "description": "React package for working with the DOM.",
+    "repos": "https://github.com/facebook/react.git",
+    "main": "react-dom",
+    "tag": "master",
+    "reposType": "npm",
+    "dependencies": {
+        "react": "^15.1.0-alpha.1"
+    },
+    "paths": {
+        "dist": "."
+    },
+    "version": "15.1.0"
+}

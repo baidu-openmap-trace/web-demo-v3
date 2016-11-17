@@ -1,0 +1,1588 @@
+input::-ms-clear{display:none;}
+body{
+    background-color: #f5f5f5;
+    background-repeat: repeat-x;
+    max-height: 800px;
+    margin: 0;
+    padding: 0;
+    font-family: '微软雅黑';
+    height: 100%;
+}
+html{
+    height: 100%;
+}
+a{
+    text-decoration: none;
+}
+abbr{
+    cursor: pointer !important;
+    text-decoration: none!important;
+    text-overflow: ellipsis; /* for IE */  
+    -moz-text-overflow: ellipsis; /* for Firefox,mozilla */  
+    ov erflow: hidden;  
+    white-space: nowrap;
+    padding: 10px 0 10px 0;
+}
+.main, .trunk, .branch{
+    width: 100%;
+    margin: 0 auto;
+    height: 100%;
+    background-color: #f5f5f5;
+}
+
+.header{
+    height: 64px;
+    width: 100%;
+    margin: 0 auto;
+    position: fixed;
+    background-image: url('/static/images/consoleback.png');
+    z-index: 100;
+}
+.login{
+    float: right;
+    width: 300px;
+    height: 100%;
+    text-align: center;
+    line-height: 62px;
+    color: #2398ff;
+    font-size: 16px;
+    cursor: pointer;
+    position: relative;
+    margin-right: 2.5%;
+}
+.username{
+    float: right;
+    height: 100%;
+    line-height:66px;
+    margin-right: 20px;
+}
+.loginManage{
+    height: 77px;
+    width: 87px;
+    background: url('static/images/loginmanage.png');
+    position: absolute;
+    top: 50px;
+    font-size: 13px;
+    color: #333;
+    z-index: 10000;
+    right: 0%;
+    /*margin-left: -43px;*/
+
+}
+.loginIconDown, .loginIconUp{
+    position: absolute;
+    height: 5px;
+    width: 9px;
+    right: 0;
+    top:30px;
+}
+.loginIconDown{
+    background: url('static/images/loginicondown.png');
+}
+.loginIconUp{
+    background: url('static/images/loginiconup.png');
+}
+.setting, .logout{
+    line-height: 37px;
+    height: 35px;
+    width: 79px;
+    margin-left: 2px;
+}
+.setting:hover, .logout:hover{
+    background-color: #f4f4f4;
+}
+.title{
+    float: left;
+    height: 48px;
+    margin-top: 14px;
+    margin-left: 1%;
+}
+
+.logo{
+    vertical-align: middle;
+    float: left;
+    height: 33px;
+    width: 38px;
+}
+.headName{
+    font-size: 28px;
+    color: #777777;
+    font-family: '黑体';
+    font-weight: lighter;
+    display: inline-block;
+    line-height: 33px;
+    text-align: center;
+    margin-left: 12px;
+}
+
+.tab{
+    float: left;
+    height: 100%;
+    margin-left: 15%;
+}
+.tabItem {
+    height: 60px;
+    float: left;
+}
+.tabItem span{
+    font-size: 18px;
+    font-family: '微软雅黑';
+    display: inline-block;
+    line-height: 60px;
+    text-align: center;
+    color: #777777;
+    width: 150px;
+    border-left: 1px solid #fff;
+    border-right: 1px solid #fff;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.tabItem span:hover, .tabItem .active {
+    border-bottom: 3px solid #2398ff;
+    border-left: 1px solid #e1eef6;
+    border-right: 1px solid #e1eef6;
+    background-color: #edf7ff;
+    color: #2398ff;
+
+}
+
+.control{
+    margin: 0 auto;
+    height: 73px;
+    display: none;
+    width: 95%;
+}
+
+.searchEntity{
+    width: 400px;
+    height: 100%;
+    float: left;
+    position: relative;
+}
+
+.addEntity{
+    width: 20%;
+    height: 100%;
+    float: right;
+}
+
+.addEntityBtn{
+    color: #0a8cff;
+    font-size: 14px; 
+    width: 160px;
+    height: 32px;
+    float: right;
+    border: 1px solid #0a8cff;
+    margin-top: 21px;
+    cursor: pointer;
+    display: block;
+    line-height: 33px;
+    text-align: center;
+    border-radius: 4px;
+    background-color: #fff;
+}
+.addEntity a:hover,.addEntity a:active,.addEntity a:visited{
+    color: #0a8cff !important;
+    text-decoration: none !important;
+}
+
+#myModal{
+    border-radius: 0;
+    width: 408px;
+    margin-left: -204px;
+    top:40%;
+    margin-top: -135px;
+}
+.addHeader{
+    height: 40px;
+    width: 100%;
+    background-color: #0a8cff;
+    color: #fff;
+    font-size: 13px;
+    font-weight: bold;
+}
+.addTitle{
+    float: left;
+    margin-top:14px;
+    margin-left: 14px;
+}
+.exitTitle{
+    display: block;
+    margin-right: 14px;
+    margin-top:14px;
+    cursor: pointer;
+    float: right;
+}
+.addContent{
+    height: 150px;
+    margin-top: 20px;
+    width: 100%;
+    font-size: 12px;
+    color: #333;
+    overflow: auto;
+}
+.addForm{
+    height: 45px;
+    width: 100%
+}
+.formDesc{
+    width: 90px;
+    float: left;
+    text-align: right;
+    display: block;
+    height: 100%;
+    line-height: 45px;
+}
+.formValue{
+    float: left;
+    width: 260px;
+    height: 100%;
+    margin-left: 10px;
+    line-height: 100%;
+    font-size: 12px;
+}
+.formValue input, .formValue select{
+    display: block;
+    height: 30px;
+    margin-top: 7px;
+    padding: 0;
+    width: 245px;
+    color: #333;
+    font-size: 12px;
+    border: 1px solid #d1d1d1;
+    padding-left: 5px;
+}
+.formValue select{
+    height: 32px;
+    width: 252px;
+    padding-left: 0;
+}
+.addFooter{
+    width: 100%;
+    height: 60px;
+}
+.addFooter span{
+    display: block;
+    height: 30px;
+    width: 90px;
+    font-size: 13px;
+    font-weight: bold;
+    text-align: center;
+    line-height: 30px;
+    border-radius: 5px;
+    float: right;
+    cursor: pointer;
+}
+.addCancel{
+    border:1px solid #d1d1d1;
+    margin-right: 10px;
+}
+
+.addEnsure{
+    border:1px solid #2297ff;
+    background-color: #2297ff;
+    color: #fff;
+    margin-right: 57px;
+}
+.searchInput{
+    display: block;
+    float: left;
+    width: 298px;
+    height: 32px;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    color: #999;
+    font-size: 12px;
+    margin-top: 21px;
+    padding-left: 15px;
+    padding-right: 35px;
+}
+
+.searchBtn{
+    display: block;
+    float: left;
+    margin-left: -32px;
+    height: 16px;
+    margin-top: 33px;
+    cursor: pointer;
+    width: 16px;
+}
+
+.clearSearchBtn{
+    display: block;
+    right: 106px;
+    height: 19px;
+    width: 19px;
+    top: 31px;
+    cursor: pointer;
+    position: absolute;
+}
+
+.line{
+    background-color: #e8e8e8;
+    height: 25px;
+    width: 2px;
+    position: absolute;
+    top: 28px;
+    right: 94px;
+}
+.hideCommon{
+    display: none !important;
+}
+
+.entityList{
+    width: 95%;
+    overflow: auto;
+    margin: 0 auto;
+    box-shadow: 1px 2px 3px 1px #cbcbcb;
+}
+
+.tableBottom{
+    background-image: url('/static/images/tablebottom.png');
+    background-repeat: repeat-x;
+    margin: 0 auto;
+    width: 1000px;
+    height: 10px;
+    clear: both;
+}
+.tableContainer{
+    margin: 0 auto;
+    
+    padding-left: -1px;
+}
+.tableLeft , .tableRight{
+    float: left;
+    background-repeat: repeat-y;
+    width: 3px;
+    height: 630px;
+}
+.tableLeft{
+    background-image: url('/static/images/tableleft.png');
+}
+.tableRight{
+    background-image: url('/static/images/tableright.png');
+}
+.tableMid{
+    float: left;
+}
+.entityTable{
+    table-layout:fixed;
+    word-break:break-all;
+    word-wrap:break-word; 
+    border-collapse:collapse;
+    border-radius: 5px;
+    margin:0 auto;
+    width: 100%;
+}
+
+.entityTable .edit{
+    cursor: text;
+}
+.entityList tr{
+    margin: 0;
+    padding: 0;
+}
+.entityList tr:hover{
+    /*background-color: #333;*/
+}
+.entityList td{
+    text-overflow: ellipsis; /* for IE */  
+    -moz-text-overflow: ellipsis; /* for Firefox,mozilla */  
+    overflow: hidden;  
+    white-space: nowrap;  
+    border-bottom:1px dashed #eeeeee;
+    border-left:1px dashed #eeeeee;
+    padding: 0;
+    background-color: #fff;
+    color: #000;
+    font-size: 12px;
+    height: 38px;
+    text-indent: 10px;
+}
+
+.entityList .entity_name{
+    /*width: 360px;*/
+    width: 25%;
+    min-width: 400px;
+}
+.entity_name abbr{
+    min-width: 400px;
+}
+
+.entityList .create_time{
+    /*width: 140px;*/
+    width: 10%;
+}
+
+.entityList .location{
+    /*width: 360px;*/
+    /*width: 25%;*/
+}
+
+.entityList .loc_time{
+    /*width: 140px;*/
+    width: 10%;
+}
+
+.entityList .other{
+    /*width: 180px;*/
+}
+.entityList .tableCheck{
+    width: 38px;
+    border-left: none;
+}
+.entityList .thead{
+    color: #fff;
+    background-color: #0a8cff;
+    /*border-left: 1px solid #2096ff;*/
+    border-bottom: none;
+}
+
+.thead .entity_name{
+}
+
+.bottomControl{
+    padding-top: 13px;
+    display: none;
+    margin: 0 auto;
+    height: 45px;
+    font-size: 12px;
+    color:#333333;
+    font-weight:normal;
+    width: 95%;
+}
+
+.selectAll{
+    float: left;
+    height: 30px;
+    width: 70px;
+    margin-top:5px;
+    margin-left: 11px;
+}
+.selectAll label{
+    font-size: 12px;
+}
+.allCheck{
+    vertical-align: middle;
+    margin-left: 10px;
+    cursor: pointer;
+}
+
+.remove{
+    float: left;
+    height: 30px;
+    width: 50px;
+    margin-top: 3px;
+    color: #0a8cff;
+    line-height: 25px;
+    cursor: pointer;
+}
+
+.page{
+    float: right;
+    height: 30px;
+}
+
+.totalPage{
+    float: left;
+    height: 30px;
+    line-height: 30px;
+    /*width: 70px;*/
+}
+
+.jumpPage{
+    float: left;
+    height: 30px;
+    line-height: 30px;
+    margin-left: 15px;
+}
+
+.jumpPage .inputPage{
+    height: 21px;
+    width: 40px;
+    display: block;
+    float: left;
+    padding: 0;
+    padding-left: 5px; 
+    margin-right: 5px;
+    margin-top: 4px;
+    border: 1px solid #cacaca;
+    border-radius: 0;
+    font-size: 12px;
+    box-shadow: none;
+    text-align: right;
+    padding-right: 5px;
+}
+
+.pageNumber{
+    float: left;
+    display: block;
+    height: 30px;
+    line-height: 30px;
+}
+.goPage{
+    display: block;
+    height: 21px;
+    margin-top:4px;
+    width: 27px;
+    border: 1px solid #cacaca;
+    cursor: pointer;
+    float: left;
+    background-color: #fff;
+    line-height: 22px;
+    text-align: center;
+    margin-left: 5px;
+}
+
+.switchPage{
+    float: left;
+    height: 21px;
+    border: 1px solid #cacaca;
+    margin-left: 10px;
+    margin-top: 4px;
+    width: 55px;
+    background-color: #fff;
+}
+
+.switchPage span{
+    display: block;
+    float: left;
+    width: 27px;
+    cursor: pointer;
+    height: 21px;
+}
+
+.lastPageOn, .lastPageOff{
+    border-right:1px solid #cacaca;
+}
+
+.lastPageOn, .lastPageOff, .nextPageOff, .nextPageOn{
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.lastPageOn{
+    background-image: url('/static/images/lastpageon.png');
+}
+
+.lastPageOff{
+    background-image: url('/static/images/lastpageoff.png');
+}
+
+.nextPageOff{
+    background-image: url('/static/images/nextpageoff.png');
+}
+
+.nextPageOn{
+    background-image: url('/static/images/nextpageon.png');
+}
+
+.visible{
+    visibility:visible;
+}
+
+.hidden{
+    visibility:hidden;
+}
+
+.entityControl,.trackControl{
+    position: absolute;
+    top:64px;
+    width: 100%;
+
+}
+.trackControl{
+    height: 100%;
+    top: 0;
+}
+.entityControl{
+    background-color: #f5f5f5;
+}
+.map , .manage{
+    position: absolute;
+    width: 100%
+}
+.map{
+    height: 100%;
+}
+.speedControl {
+    height: 220px;
+    width: 32px;
+    background-image: url('static/images/speedcontrol_2x.png');
+    cursor: pointer;
+    background-size: 32px 220px;
+}
+.zoom{
+    height: 64px;
+    width: 32px;
+    background: url('static/images/zoom.png');
+    cursor: pointer;
+}
+
+.zoomIn, .zoomOut{
+    height: 30px;
+    width: 32px;
+    margin-top: 1px;
+}
+
+.trafficOn, .trafficOff, .earth, .normal{
+    height: 33px;
+    width: 32px;
+    cursor: pointer;
+    background-size: 32px 33px;
+    background-repeat: no-repeat;
+}
+.trafficOn{
+    background-image: url('static/images/trafficoff_2x.png');
+}
+
+.trafficOff{
+    background-image: url('static/images/trafficon_2x.png');
+}
+
+.earth{
+    background-image: url('static/images/normal_2x.png');
+}
+
+.normal{
+    background-image: url('static/images/earth_2x.png');
+}
+
+.manageControl{
+    height: 570px;
+    width: 320px;
+    position: absolute;
+    left: 15px;
+    top: 72px;
+    
+}
+
+.manageTop{
+    height: 42px;
+    width: 320px;
+    /*background: url('static/images/managetop.png');*/
+    border-bottom: 1px solid #2f9dff;
+    background-color: #0a8cff;
+    box-shadow: 1px 2px 3px 1px #cbcbcb;
+}
+/*todo 高度适应始终露出logo*/
+.manageBottom{
+    height: 527px;
+    width: 320px;
+    /*background: url('static/images/managebottom.png');*/
+    
+}
+
+#manageBottom{
+    box-shadow: 1px 2px 3px 1px #cbcbcb;
+}
+
+.serviceName{
+    height: 100%;
+    width: 92%;
+    font-size: 14px;
+    color: #fff;
+    font-weight: bold;
+    line-height: 48px;
+    text-align: center;
+}
+
+.toggleInManage, .toggleOutManage{
+    width: 40px;
+    height: 41px;
+    position: absolute;
+    right: 4px;
+    top: 1px;
+    cursor: pointer;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+.toggleInManage{
+    background-image: url('static/images/togglein_2x.png');
+    background-repeat: no-repeat;
+    background-size: 12px 7px;
+}
+
+.toggleOutManage{
+    background-image: url('static/images/toggleout_2x.png');
+    background-repeat: no-repeat;
+    background-size: 12px 7px;
+}
+.manageTab{
+    width: 320px;
+    height: 38px;
+    position: relative;
+    background-color: #2398ff;
+}
+.monitorTab,.trackTab{
+    position: relative;
+    float: left;
+    width: 50%;
+    height: 100%;
+    font-size: 12px;
+    text-align: center;
+    line-height: 38px;
+    color: white; 
+    cursor: pointer;
+}
+
+.monitorTabIcon, .trackTabIcon{
+    position: absolute;
+    height: 18px;
+    width: 14px;
+    top: 10px;
+    left: 35px;
+}
+
+.monitorTabIcon{
+    background: url('static/images/monitor_2x.png');
+    background-size: 14px 18px;
+    background-repeat: no-repeat;
+}
+
+.trackTabIcon{
+    background: url('static/images/track_2x.png');
+    background-size: 14px 18px;
+    background-repeat: no-repeat;
+}
+
+.pointerTabLeft{
+    position: absolute;
+    width: 16px;
+    height: 9px;
+    bottom: 0;
+    background: url('static/images/pointer.png');
+    left: 25%;
+    margin-left: -8px;
+    transition: all 0.2s ease-in-out;
+}
+
+.pointerTabRight{
+    position: absolute;
+    width: 16px;
+    height: 9px;
+    bottom: 0;
+    background: url('static/images/pointer.png');
+    left: 75%;
+    margin-left: -8px;
+    transition: all 0.2s ease-in-out;
+}
+
+.track, .monitor{
+    position: absolute;
+    height: 100%;
+    width: 320px;
+    left: 1px;
+    background-color: white;
+}
+
+.block{
+    display: block;
+}
+
+.blank{
+    display: none;
+}
+
+.extend{
+    visibility: inherit;
+}
+
+.monitorSearch{
+    height: 36px;
+    width: 100%;
+    margin-top: 12px;
+    position: relative;
+    margin-bottom: 15px;
+}
+
+.monitorList{
+    margin:0 auto;
+    width: 320px;
+    height: 28px;
+    border-bottom: 2px solid #e8e8e8;
+    position: relative;
+}
+
+.monitorAll, .monitorOnline, .monitorOffline{
+    float: left;
+    width: 33.3%;
+    height: 100%;
+    text-align: center;
+    line-height: 28px;
+    color: #333;
+    font-size: 12px;
+    cursor: pointer;
+}
+.monitorBottomLineLeft, .monitorBottomLineMid, .monitorBottomLineRight{
+    height: 2px;
+    width: 33.3%;
+    background-color: #2398ff;
+    position: absolute;
+    bottom: -2px;
+    transition: left 0.2s ease-in-out;
+}
+.monitorBottomLineLeft{
+    left: 0;
+}
+.monitorBottomLineMid{
+    left: 33.3%;
+}
+.monitorBottomLineRight{
+    left: 66.6%;
+}
+
+.searchInputMonitor{
+    display: block;
+    float: left;
+    margin-left: 15px;
+    width: 240px;
+    height: 29px;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    color: #999;
+    font-size: 12px;
+    padding: 0;
+    padding-left: 15px;
+    padding-right: 35px;
+}
+
+.searchBtnMonitor{
+    display: block;
+    float: left;
+    margin-left: -32px;
+    height: 16px;
+    margin-top: 8px;
+    cursor: pointer;
+    width: 16px;
+}
+
+.clearSearchBtnMonitor{
+    display: block;
+    right: 70px;
+    height: 16px;
+    width: 16px;
+    top: 8px;
+    cursor: pointer;
+    position: absolute;
+}
+
+.lineMonitor{
+    background-color: #e8e8e8;
+    height: 25px;
+    width: 1px;
+    position: absolute;
+    top: 4px;
+    right: 58px;
+}
+
+.monitorAllContent, .monitorOnlineContent, .monitorOfflineContent, .trackContent{
+    position: absolute;
+    width: 320px;
+    left: 50%;
+    margin-left: -160px;
+}
+
+.monitorFrame{
+    height: 350px;
+    width: 100%;
+}
+
+.monitorPage{
+    height: 30px;
+    float: right;
+    margin-top: 5px;
+    font-size: 12px;
+    color: #333333;
+    font-weight: bold;
+    margin-right: 5px;
+}
+
+.monitorListItem0, .monitorListItem1, .monitorListItem2, .monitorListItem{
+    width: 100%;
+    background-position: 6% 50%;
+    background-repeat: no-repeat;
+    height: 34px;
+    line-height: 35px;
+    border-bottom: 1px dashed #eeeeee;
+    font-size: 12px;
+    cursor: pointer;
+    background-size: 16px 14px;
+}
+.monitorListItem0:hover, .monitorListItem1:hover, .monitorListItem2:hover{
+    background-color: #f4f4f4;
+}
+.monitorSelect{
+    background-color: #f4f4f4;
+}
+.monitorListItem0, .carInfoHeader0{
+    background-image: url('static/images/carrun_2x.png');
+    color: #333;
+}
+.monitorListItem1, .carInfoHeader1{
+    background-image: url('static/images/carstatic_2x.png');
+    color: #666;
+}
+.monitorListItem2, .carInfoHeader2{
+    background-image: url('static/images/caroff_2x.png');
+    color: #999;
+}
+.monitorListItemName, .monitorListItemNameoff{
+    float: left;
+    width: 150px;
+    padding-left: 50px;
+    height: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.monitorListItemSpeed{
+    float: right;
+    padding-right: 10px;
+    width: 80px;
+    height: 100%;
+    text-align: right;
+}
+
+.monitorListItemNameoff{
+    width: 260px;
+}
+
+.carInfoBox{
+    height: 221px;
+    width: 313px;
+    background:url('static/images/infobox.png');
+}
+
+.carInfoWindow{
+    width: 278px;
+    margin-left: 25px;
+}
+
+.carInfoHeader0, .carInfoHeader1, .carInfoHeader2{
+    height: 40px;
+    margin-top: 10px;
+    line-height: 40px;
+    font-size: 13px;
+    background-repeat: no-repeat;
+    background-position: left center;
+    padding-left: 25px;
+    width: 225px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    background-size: 16px 14px;
+}
+
+.carInfoContent{
+    height: 110px;
+    width: 100%;
+    font-size: 12px;
+    overflow: auto;
+    -webkit-overflow-scrolling:touch;
+}
+
+.carInfoItem{
+    min-height: 30px;
+    width: 250px;
+    line-height: 30px;
+    float: left;
+}
+
+.infoItemTitle{
+    color: #333;
+    width: 55px;
+    height: 100%;
+    float: left;
+    text-align: left;
+    font-weight: bold;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.infoItemContent{
+    color: #666;
+    float: right;
+    width: 195px;
+    height: 100%;
+/*    white-space: nowrap;
+    text-overflow: ellipsis;*/
+}
+
+.run{
+    color:#2398ff;
+}
+.infoControl{
+    height: 40px;
+    width: 275px;
+    float: left;
+}
+
+.infoZoomIn{
+    height: 100%;
+    line-height: 40px;
+    background-position: left center;
+    background-repeat: no-repeat;
+    background-image: url('static/images/zoominicon.png');
+    width: 35px;
+    font-size: 12px;
+    color: #666;
+    cursor: pointer;
+    float: right;
+    text-align: left;
+    padding-left: 25px;
+}
+
+.trackSearch{
+    height: 33px;
+    width: 100%;
+    margin-top: 8px;
+    position: relative;
+    margin-bottom: 7px;
+}
+
+.trackDatetime{
+    height: 33px;
+    width: 100%;
+    margin-top: 12px;
+    position: relative;
+}
+
+#datetimepicker{
+    width: 100%;
+    position: relative;
+}
+
+#datetimepicker .datetimeInput{
+    width: 240px;
+    margin-left: 15px;
+    display: block;
+    height: 29px;
+    color:#999;
+    font-size: 12px;
+    padding: 0;
+    padding-left: 15px;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    float: left;
+    padding-right: 35px;
+    text-align: center;
+    font-size: 12px;
+    color: #999
+}
+
+#datetimepicker .datetimeBtn{
+    position: absolute;
+    right: 30px;
+    border:none;
+    top: 12px;
+    background:url('/static/images/nextpageoff.png');
+    height: 7px;
+    width: 12px;
+    cursor: pointer;
+    display: block;
+    float: left;
+    padding: 0;
+    margin: 0;
+    min-width: 0;
+    z-index: 100;
+}
+
+.icon-th{
+    display: none !important;
+}
+
+.datetimepicker table tr td.active.active{
+    background: no-repeat;
+    background-color: #2398ff !important;
+}
+
+.loading{
+    height: 34px;
+    width: 60px;
+    background-position: right center;
+    background-repeat: no-repeat;
+    background-image: url('/static/images/loading.gif');
+}
+
+#timelineContainer{
+    width: 100%;
+    position: absolute;
+}
+
+.timeline{
+    position: absolute;
+    width: 890px;
+    height: 50px;
+    border-radius: 5px;
+    background-color:rgba(255,255,255,0.8);
+    right: 15px;
+    bottom: 15px;
+    box-shadow: 1px 1px 3px 1px #cbcbcb;
+}
+
+.timelineControl{
+    width: 130px;
+    height: 100%;
+    float: left;
+}
+
+.timelinePlay, .timelineSlow, .timelineQuick, .timelinePause{
+    float: left;
+    height: 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    opacity: 1;
+}
+
+.timelinePlay{
+    width: 50px;
+    background-image: url('/static/images/play_2x.png');
+    background-size: 40px 40px;
+}
+.timelinePlay:hover{
+    background-image: url('/static/images/playhover_2x.png');
+}
+.timelinePause{
+    width: 50px;
+    background-image: url('/static/images/pause_2x.png');
+    background-size: 40px 40px;
+}
+.timelinePause:hover{
+    background-image: url('/static/images/pausehover_2x.png');
+}
+
+.timelineSlow{
+    width: 35px;
+    background-image: url('/static/images/slow_2x.png');
+    background-size: 28px 28px;
+}
+.timelineSlow:hover{
+    background-image: url('/static/images/slowhover_2x.png');
+}
+
+.timelineQuick{
+    width: 35px;
+    background-image: url('/static/images/quick_2x.png');
+    background-size: 28px 28px;
+}
+.timelineQuick:hover{
+    background-image: url('/static/images/quickhover_2x.png');
+}
+
+.timelineMain{
+    margin-left: 12px;
+    width: 721px;
+    float: left;
+    height: 100%;
+    position: relative;
+    cursor: pointer;
+}
+
+.timeHour{
+    height: 6px;
+    border-bottom: 1px solid #c2c2c4;
+    border-top: 1px solid #c2c2c4;
+    border-left: 1px solid #a3a3a4;
+    width: 29px;
+    float: left;
+    margin-top: 22px;
+    background-color: #c2c2c4;
+}
+
+.timeHourFirst{
+    border-bottom-left-radius: 3px;
+    border-top-left-radius: 3px;
+}
+
+.timeHourFinal{
+    border-bottom-right-radius: 3px;
+    border-top-right-radius: 3px;
+    border-right: 1px solid #a3a3a4;
+}
+
+.timeNumber{
+    position: absolute;
+    height: 15px;
+    width: 15px;
+    font-size: 13px;
+    bottom: 2px;
+    color: #222;
+    -webkit-user-select:none;
+    -moz-user-select:none;
+    -ms-user-select:none;
+    user-select:none;
+}
+
+.timelineProgress{
+    background-image: url('/static/images/progress.png');
+    height: 40px;
+    width: 40px;
+    position: absolute;
+    cursor: pointer;
+    top: 4px;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: 10;
+}
+
+.runPart{
+    background-color: #2398ff;
+    height: 6px;
+    top: 22px;
+    position: absolute;
+    border: 1px solid #218eef;
+}
+
+.trackAnalysis{
+    height: 130px;
+    width: 301px;
+    position: absolute;
+    top: 72px;
+    right: 15px;
+    font-weight: bold;
+}
+
+.trackAnalysisHeader{
+    width: 301px;
+    height: 37px;
+    float: left;
+    background: url('/static/images/analysisheader.png');
+}
+
+.trackAnalysisProcess, .trackAnalysisBehavior{
+    height: 85px;
+    width: 301px;
+    background: url('/static/images/analysisprocesscontent.png');
+    position: absolute;
+    left: 0;
+    top:40px;
+    color: #333;
+    font-size: 12px;
+}
+.trackAnalysisProcess{
+    height: 85px;
+    background: url('/static/images/analysisprocesscontent.png');
+}
+.trackAnalysisBehavior{
+    background: url('/static/images/analysisbehaviorcontent.png');
+    height: 115px;
+}
+
+.analysisHeaderLine{
+    background-color: #f0f0f0;
+    background-position: center;
+    height: 20px;
+    width: 1px;
+    float: left;
+    margin-top: 7px;
+    margin-left: 23px;
+}
+
+.analysisHeaderTitle1On, .analysisHeaderTitle1Off{
+    float: left;
+    background-position: left center;
+    width: 80px;
+    height: 34px;
+    line-height: 34px;
+    font-size: 12px;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    text-indent: 25px;
+    margin-left: 20px;
+    background-size: 16px 16px;
+
+}
+.analysisHeaderTitle1On{
+    background-image: url('/static/images/processiconon_2x.png');
+    color: #2398ff;
+}
+
+.analysisHeaderTitle1Off{
+    background-image: url('/static/images/processiconoff_2x.png');
+    color: #333333;
+}
+
+.analysisHeaderTitle2On, .analysisHeaderTitle2Off{
+    float: left;
+    background-position: left center;
+    width: 105px;
+    height: 34px;
+    line-height: 34px;
+    font-size: 12px;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    text-indent: 25px;
+    margin-left: 25px;
+    background-size: 16px 16px;
+
+}
+.analysisHeaderTitle2On{
+    background-image: url('/static/images/analysisiconon_2x.png');
+    color: #2398ff;
+}
+
+.analysisHeaderTitle2Off{
+    background-image: url('/static/images/analysisiconoff_2x.png');
+    color: #333333;
+}
+
+.analysisHeaderPointOnDown, .analysisHeaderPointOffDown, .analysisHeaderPointOnUp, .analysisHeaderPointOffUp{
+    background-repeat: no-repeat;
+    background-position: center;
+    width: 15px;
+    height: 34px;
+    cursor: pointer;
+    float: left;
+}
+
+.analysisHeaderPointOnDown{
+    background-image: url('/static/images/loginicondown.png');
+}
+.analysisHeaderPointOffDown{
+    background-image: url('/static/images/analysisoffdown.png');
+}
+.analysisHeaderPointOnUp{
+    background-image: url('/static/images/loginiconup.png');
+}
+.analysisHeaderPointOffUp{
+    background-image: url('/static/images/analysisoffup.png');
+}
+
+.processClose, .behaviorClose{
+    height: 30px;
+    width: 30px;
+    position: absolute;
+    background-image: url('/static/images/closeinfowindow.png');
+    top: 5px;
+    right: 8px;
+    cursor: pointer;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.processTile, .behaviorTile{
+    height: 20px;
+    width: 70px;
+    line-height: 20px;
+    text-align: center;
+    float: left;
+    margin-top: 12px;
+    margin-left: 5px;
+}
+.behaviorTile{
+    width: 95px;
+}
+.processSwitchOn, .processSwitchOff,.behaviorSwitchOn, .behaviorSwitchOff{
+    width: 46px;
+    height: 20px;
+    margin-top: 12px;
+    float: left;
+    cursor: pointer;
+    background-size: 46px 20px;
+    background-repeat: no-repeat;
+    background-repeat: no-repeat;
+}
+
+.processSwitchOn, .behaviorSwitchOn{
+    background-image: url('/static/images/analysison.png');
+}
+
+.processSwitchOff, .behaviorSwitchOff{
+    background-image: url('/static/images/analysisoff.png');
+}
+@media (-o-min-device-pixel-ratio: 5/4), (-webkit-min-device-pixel-ratio: 1.25), (min-resolution: 120dpi), (min-resolution: 1.25dppx) {
+    .processSwitchOn, .behaviorSwitchOn{
+        background-image: url('/static/images/analysison_2x.png');
+    }
+    
+    .processSwitchOff, .behaviorSwitchOff{
+        background-image: url('/static/images/analysisoff_2x.png');
+    }
+}
+
+.processControl{
+    float: left;
+    height: 25px;
+    width: 300px;
+    margin-left: 15px;
+    margin-top: 10px;
+}
+
+.processControlItem{
+    width: 75px;
+    line-height: 25px;
+    height: 25px;
+    float: left;
+}
+
+.processControlItem label, .controlItemBot label{
+    display: inline-block;
+    margin: 0;
+    font-size: 12px;
+    text-indent: 9px;
+    line-height: 25px;
+    font-weight: bold;
+}
+
+.behaviorControl{
+    width: 299px;
+    float: left;
+    height: 60px;
+    margin-top: 11px;
+}
+
+.behaviorControlItem{
+    height: 60px;
+    width: 74px;
+    float: left;
+}
+.controlItemNumOn, .controlItemNumOff{
+    font-weight: normal;
+    font-family: 'Arial';
+    font-size: 24px;
+    height: 34px;
+    line-height: 34px;
+    float: left;
+    text-align: center;
+    width: 100%;
+}
+.controlItemNumOn{
+    color: #2398ff;
+}
+.controlItemNumOff{
+    color: #999999;
+}
+.controlItemBot{
+    width: 100%;
+    float: left;
+    text-align: center;
+}
+
+.controlItemLine{
+    height: 57px;
+    width: 1px;
+    background-color: #e6e9ec;
+    float: left;
+    margin-top: 1.5px;
+}
+
+.behaviorOverlay{
+    height: 20px;
+    width: 20px;
+    position: absolute;
+    z-index: 1;
+    background-repeat: no-repeat;
+    background-position: left center;
+    border-radius: 10px;
+    color:#333;
+    font-size: 12px;
+    background-color: white;
+    line-height: 20px;
+    text-indent: 22px;
+    font-weight: bold;
+    transition: all 0.2s ease-in-out;
+    overflow: hidden;
+}
+
+.behaviorPlace{
+    background-image: url('/static/images/place.png');
+}
+
+.behaviorAccelecation{
+    background-image: url('/static/images/warning.png');
+}
+
+.behaviorSteering{
+    background-image: url('/static/images/warning.png');
+}
+
+.behaviorBreaking{
+    background-image: url('/static/images/warning.png');
+}
+
+.behaviorSpeeking{
+    background-image: url('/static/images/warning.png');
+}
+
+
+.edit .editEntity{
+    display: inline-block;
+    width: 100%;
+    height: 100%;
+    border: 1px solid white;
+    box-sizing: border-box;
+    box-shadow: none;
+    border-radius: 0;
+    margin:0;
+    padding: 0;
+    font-size:12px;
+    color:black;
+    text-indent: 10px;
+
+}
+
+.entityList td.edit{
+    text-indent: 0;
+}
+.trunk{
+    /*z-index: 0;*/
+    position: absolute;
+}
+.branch{
+    /*visibility: hidden;*/
+    z-index: -100;
+    position: absolute;
+}
+.datamap{
+    height: 100%;
+    width: 100%;
+}
+.dataTitle{
+    position: absolute;
+    z-index: 100;
+    color: #ffe;
+    opacity: 0;
+    left: 50%;
+    top: 50%;
+    font-size: 30px;
+    margin-left: -350px;
+}
+.dataTitleLine1{
+    font-size: 20px;
+}
+.dataTitleLine1, .dataTitleLine2{
+    height: 50px;
+    line-height: 50px;
+    text-align: center;
+    width: 700px;
+}
+.gobtn, .backbtn{
+    position: absolute;
+    top: 2px;
+    cursor: pointer;
+    height: 60px;
+    width: 60px;
+    /*background-color: green;*/
+    z-index: 100;
+    background-size: 60px 60px;
+}
+
+.gobtn{
+    left: 15%;
+    margin-left: 480px;
+    display: none;
+    background-image: url('/static/images/gift_2x.png');
+}
+
+.backbtn{
+    left: 20px;
+    top: 20px;
+    /*margin-left: 480px;*/
+    /*display: none;*/
+    background-image: url('/static/images/databack_2x.png');
+}

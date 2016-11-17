@@ -112,6 +112,12 @@ stores中接受views触发的actions，执行响应的操作。并触发回调�
 
 <h4 id="2.2">2.2 举个栗子</h4>
 做了这么多铺垫，下面进入整体。用一个完整的例子来说明DEMO的使用方式。
+首先通过[安装nodejs](https://nodejs.org/en/)获取到npm工具包。  
+接着使用npm安装FIS3:  
+`npm install -g fis3`  
+更多FIS3资料请[参考官网](http://fis.baidu.com/)  
+  
+
 
 
 
