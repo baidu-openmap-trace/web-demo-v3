@@ -12,11 +12,11 @@
 >[2 开发说明](#2)  
 >>[2.1 代码结构和功能点对应](#2.1)  
 >>[2.2 举个栗子](#2.2)  
->>[2.3 开发方式](#2.3)   
+>>[2.3 帐号配置](#2.3)   
+>>[2.4 关于POST功能](#2.4)   
 >
 ><mark>[3 注意事项](#3)
->><mark>[3.1 帐号安全](#3.1)  
->><mark>[3.2 版权声明](#3.2)  
+>><mark>[3.1 版权声明](#3.1)    
 
 <h3 id="1">1 前言</h3>
 <h4 id="1.1">1.1 版本说明</h4>
@@ -111,14 +111,38 @@ stores中接受views触发的actions，执行响应的操作。并触发回调�
 
 
 <h4 id="2.2">2.2 举个栗子</h4>
-做了这么多铺垫，下面进入整体。用一个完整的例子来说明DEMO的使用方式。
-首先通过[安装nodejs](https://nodejs.org/en/)获取到npm工具包。  
-接着使用npm安装FIS3:  
-`npm install -g fis3`  
-更多FIS3资料请[参考官网](http://fis.baidu.com/)  
-  
+做了这么多铺垫，下面进入整体。用一个完整的例子来说明DEMO的使用方式。  
+(1) 首先通过[安装nodejs](https://nodejs.org/en/)获取到npm工具包。  
 
+(2) 接着打开命令行使用npm安装FIS3:  `npm install -g fis3`  更多FIS3资料请[参考官网](http://fis.baidu.com/) 。 
 
+(3) 之后将代码库完整下载并解压到项目路径，执行`npm install`安装package.json中定义的依赖的包内容。  
+
+(4) 在1.2节的最后，提到了推荐申请两个AK。接下来对调用JSAPI的AK进行配置(下文统一称AK 1)。选择自己常用的编辑器。打开./manager.html。查看代码24行  
+`<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=您的AK1&callback=mapControl.initMap"></script>`  
+此处将AK 1替换掉"您的AK1"并保存修改。  
+
+(5) 配置好AK 1后重新回到命令行，cd到项目的根目录。执行`fis3 release demo` 如果已经看过了FIS3的文档，那么就会理解这行命令的作用是根据fis-config.js文件的配置去编译DEMO。在fis-config.js中，已经写好了默认的编译规则。  
+按照默认的配置，项目此时已经被发布到本地的Web Server。接着在命令行输入`fis3 server start`来启动打开网页。  
+如果看到上图的目录结构，就说明项目已经发布成功了。接下来点击目录中的manager.html进入到管理台界面，此时的URL是`http://127.0.0.1:8080/manager.html`  
+
+(6) 到此为止我们已经能够在自己的本地环境中查看没有任何数据管理台了，接下来需要将您的鹰眼service_id和AK以参数的形式添加到URL中。例如`http://127.0.0.1:8080/manager.html?service_id=111111&ak=FDe8fsahjkfaskhfcz`就可以看到自己的数据了。  
+<mark>再次提醒，管理台DEMO默认获取service\_id和AK的方式是通过解析URL，为了您的数据安全，强烈将他们隐藏在后端。</mark>
+
+(7) 截至上一步，项目环境已经走通了。大家在开发过程中，可以使用`fis3 release demo -wl`组合命令，这样代码更新保存之后，FIS3会自动编译，并刷新浏览器查看最新效果。如果有更多的构建需求，请参考[FIS3文档](http://fis.baidu.com/)。
+
+<h4 id="2.3">2.3 帐号配置</h4>
+2.2节(6)中提到目前管理台DEMO是通过URL配置获取的service_id和AK的。这块逻辑代码位于./script/common/urls.js的64行。  
+所有的鹰眼数据请求和地址解析的请求都会使用JSONP的形式加载，在jsonp函数中，统一获取url中的ak和service_id添加到请求的参数中。如果需要配置ak和service_id，可以在修改此处代码。
+
+<h4 id="2.4">2.3 关于POST功能</h4>
+鹰眼Web服务API的接口分为GET和POST两大类，涉及数据查看的基本上是GET，涉及到增删改敏感操作的基本上POST。  
+因为浏览器前端存在跨域的限制，不能直接用AJAX请求数据。所以DEMO对于所有的GET请求都使用了JSONP的方案进行实现。对于终端管理中的删除终端、编辑自定义字段两个功能，使用的是POST，因此没有进行实现。开发者如果对这两个接口有需求的话，需要自己编写一个和DEMO同域的代理服务，转发DEMO的POST请求到鹰眼Web API服务。<mark>实际上我们是强烈推荐这么做的，最好的方式是讲所有的GET请求也走自己的代理服务器，这样就能将自己的service_id和AK隐藏起来了。</mark>
+
+<h3 id="3">3 注意事项</h3>
+<h4 id="3.1>版权声明</h4>
+本源码开放的初衷是方便各位百度地图鹰眼的用户对轨迹管理台进行个性化的开发，融合到自己的现有系统中。严禁作为工具进行二次开放盈利。
+同时，严禁对轨迹监控页面左下角的百度地图LOGO进行遮挡或删除。
 
 
 
