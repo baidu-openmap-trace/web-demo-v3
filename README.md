@@ -1,8 +1,11 @@
-# 百度地图鹰眼轨迹管理台demo-v3
+
+# 百度地图鹰眼轨迹管理台demo-v3 
 **相关链接：**  
 [百度地图开放平台](http://lbsyun.baidu.com/)  
 [百度地图鹰眼轨迹服务](http://lbsyun.baidu.com/trace)  
-[百度底图鹰眼开发者社区](http://bbs.lbsyun.baidu.com/forum.php?mod=forumdisplay&fid=26)  
+[百度地图鹰眼轨迹管理台](http://lbsyun.baidu.com/index.php?title=yingyan/manage)  
+[百度地图鹰眼开发者社区](http://bbs.lbsyun.baidu.com/forum.php?mod=forumdisplay&fid=26)  
+
 ## 参考文档
 ###目录###
 >[1 前言](#1)  
@@ -14,6 +17,7 @@
 >>[2.2 举个栗子](#2.2)  
 >>[2.3 帐号配置](#2.3)   
 >>[2.4 关于POST功能](#2.4)   
+>>[2.5 接口版本说明](#2.5)  
 >
 >**[3 注意事项](#3)**
 >>**[3.1 版权声明](#3.1)**    
@@ -58,13 +62,13 @@
 
 
 下载管理台DEMO源码前，建议配置好NPM和FIS3的使用环境，具体方法可以参考这两个工具的官网。  
-如果目前位置您还没有申请百度地图开发者帐号或没有AK，也请提前[申请配置好ak](http://lbsyun.baidu.com/apiconsole/key)。此处为了帐号安全，**强烈建议您为项目单独申请2个AK，并且分别开启不同的权限。AK 1作为鹰眼和地址解析使用，最好能够藏在您的服务端，防止泄露。AK 2作为JSAPI使用，只能放在页面前端，会暴露给系统用户。**
+如果目前位置您还没有申请百度地图开发者帐号或没有AK，也请提前[申请配置好ak](http://lbsyun.baidu.com/apiconsole/key)。此处为了帐号安全，**强烈建议您为项目单独申请2个AK，并且分别开启不同的权限。AK 1作为JSAPI使用，只能放在页面前端，会暴露给系统用户。AK 2作为鹰眼和地址解析使用，最好能够藏在您的服务端，防止泄露。**
 
 
 <h3 id="2">2 开发说明</h3>
 <h4 id="2.1">2.1 代码结构和功能点对应</h4>
 >component  ----------------------------------  依赖库，一般不用修改  
->node_modules  -------------------------------  依赖库，一般不用修改  
+>node_modules  -------------------------------  依赖库，一般不用修改，需要运行npm install自动安装  
 >script  -------------------------------------  核心逻辑部分   
 >>common  ------------------------------------  全局公共方法
 >>>commonfun.js  -----------------------------  全局公共方法  
@@ -82,6 +86,8 @@
 >fis-conf.js  --------------------------------  fis3编译配置文件  
 >manager.html  -------------------------------  系统入口HTML文件  
 >package.json  -------------------------------  npm 配置文件  
+>README.md  ----------------------------------  说明文档 项目中建议删除  
+>readmeImages  -------------------------------  说明文档中用到的图片 项目指令建议删除
 
 如果大家在做二开的时候，只是简单的修改样式，那么修改./static/css/common.css文件应该就可以满足需求了。  
 如果需要对模块的内部逻辑进行修改需要修改./script/modules/下对应的路径了。modules路径下的三个文件夹中的结构相似。以entitycontrol为例说明，结构为
@@ -114,7 +120,7 @@ stores中接受views触发的actions，执行响应的操作。并触发回调�
 做了这么多铺垫，下面进入整体。用一个完整的例子来说明DEMO的使用方式。  
 (1) 首先通过[安装nodejs](https://nodejs.org/en/)获取到npm工具包。  
 	
-(2) 接着打开命令行使用npm安装FIS3:  `npm install -g fis3`  更多FIS3资料请[参考官网](http://fis.baidu.com/) 。 
+(2) 接着打开命令行使用npm安装FIS3:  `npm install -g fis3`  更多FIS3资料请[参考官网](http://fis.baidu.com/) 。之后输入`fis3`验证安装成功。 
 ![npminstall](https://raw.githubusercontent.com/baidu-openmap-trace/web-demo-v3/master/readmeImages/fis3install.png)   
 (3) 之后将代码库完整下载并解压到项目路径，执行`npm install`安装package.json中定义的依赖的包内容。  
 ![npminstall](https://raw.githubusercontent.com/baidu-openmap-trace/web-demo-v3/master/readmeImages/npminstall.png)  
@@ -129,21 +135,24 @@ stores中接受views触发的actions，执行响应的操作。并触发回调�
 ![npminstall](https://raw.githubusercontent.com/baidu-openmap-trace/web-demo-v3/master/readmeImages/page.png)  
 如果看到上图的目录结构，就说明项目已经发布成功了。接下来点击目录中的manager.html进入到管理台界面，此时的URL是`http://127.0.0.1:8080/manager.html`  
 ![npminstall](https://raw.githubusercontent.com/baidu-openmap-trace/web-demo-v3/master/readmeImages/nodata.png) 
-(6) 到此为止我们已经能够在自己的本地环境中查看没有任何数据管理台了，接下来需要将您的鹰眼service_id和AK以参数的形式添加到URL中。例如`http://127.0.0.1:8080/manager.html?service_id=111111&ak=FDe8fsahjkfaskhfcz`就可以看到自己的数据了。  
+(6) 到此为止我们已经能够在自己的本地环境中查看没有任何数据管理台了，接下来需要将您的鹰眼service_id和之前准备好的AK 2以参数的形式添加到URL中。例如`http://127.0.0.1:8080/manager.html?service_id=111111&ak=FDe8fsahjkfaskhfcz`就可以看到自己的数据了。  
 ![npminstall](https://raw.githubusercontent.com/baidu-openmap-trace/web-demo-v3/master/readmeImages/data.png) 
 **再次提醒，管理台DEMO默认获取service\_id和AK的方式是通过解析URL，为了您的数据安全，强烈将他们隐藏在后端。**
 
 (7) 截至上一步，项目环境已经走通了。大家在开发过程中，可以使用`fis3 release demo -wl`组合命令，这样代码更新保存之后，FIS3会自动编译，并刷新浏览器查看最新效果。如果有更多的构建需求，请参考[FIS3文档](http://fis.baidu.com/)。
 
 <h4 id="2.3">2.3 帐号配置</h4>
-2.2节(6)中提到目前管理台DEMO是通过URL配置获取的service_id和AK的。这块逻辑代码位于./script/common/urls.js的64行。  
-所有的鹰眼数据请求和地址解析的请求都会使用JSONP的形式加载，在jsonp函数中，统一获取url中的ak和service_id添加到请求的参数中。如果需要配置ak和service_id，可以在修改此处代码。  
+2.2节(6)中提到目前管理台DEMO是通过URL配置获取的service\_id和AK 2的。这块逻辑代码位于./script/common/urls.js的64行。  
+所有的鹰眼数据请求和地址解析的请求都会使用JSONP的形式加载，在jsonp函数中，统一获取url中的ak和service\_id添加到请求的参数中。如果需要配置ak和service\_id，可以在修改此处代码。  
 ![npminstall](https://raw.githubusercontent.com/baidu-openmap-trace/web-demo-v3/master/readmeImages/ak.png) 
 
 
-<h4 id="2.4">2.3 关于POST功能</h4>
+<h4 id="2.4">2.4 关于POST功能</h4>
 鹰眼Web服务API的接口分为GET和POST两大类，涉及数据查看的基本上是GET，涉及到增删改敏感操作的基本上POST。  
-因为浏览器前端存在跨域的限制，不能直接用AJAX请求数据。所以DEMO对于所有的GET请求都使用了JSONP的方案进行实现。对于终端管理中的删除终端、编辑自定义字段两个功能，使用的是POST，因此没有进行实现。开发者如果对这两个接口有需求的话，需要自己编写一个和DEMO同域的代理服务，转发DEMO的POST请求到鹰眼Web API服务。**实际上我们是强烈推荐这么做的，最好的方式是讲所有的GET请求也走自己的代理服务器，这样就能将自己的service_id和AK隐藏起来了。**
+因为浏览器前端存在跨域的限制，不能直接用AJAX请求数据。所以DEMO对于所有的GET请求都使用了JSONP的方案进行实现。对于终端管理中的删除终端、编辑自定义字段两个功能，使用的是POST，因此没有进行实现。开发者如果对这两个接口有需求的话，需要自己编写一个和DEMO同域的代理服务，转发DEMO的POST请求到鹰眼Web API服务。**实际上我们是强烈推荐这么做的，最好的方式是将所有的请求（包括GET）都走自己的代理服务器，这样就能将自己的service_id和AK 2隐藏起来了。**
+
+<h4 id="2.5">2.5 接口版本说明</h4>
+细心的同学可能会发现，目前我们DEMO在./script/common/urls.js中定义的鹰眼Web服务API的接口和文档中的不一致，而且多出了entity/search接口。这是因为在v3版本的管理台中我们率先使用了鹰眼最新版本web服务 API，这也是管理台能够如此给力的强大基础。不过大家不用着急，这些最新版本的接口很快就会正式公布了！
 
 <h3 id="3">3 注意事项</h3>
 <h4 id="3.1">版权声明</h4>
