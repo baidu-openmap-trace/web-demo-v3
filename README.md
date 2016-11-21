@@ -6,6 +6,8 @@
 [百度地图鹰眼轨迹管理台](http://lbsyun.baidu.com/index.php?title=yingyan/manage)  
 [百度地图鹰眼开发者社区](http://bbs.lbsyun.baidu.com/forum.php?mod=forumdisplay&fid=26)  
 
+##更新日志##
+2016.11.21:修复城市列表控件位置错误导致不可见的bug
 ## 参考文档
 ###目录###
 >[1 前言](#1)  
