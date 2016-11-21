@@ -163,7 +163,7 @@ window.mapControl = {
      *
      */
     addCityListControl: function() {
-       var size = new BMap.Size(360, 8);
+       var size = new BMap.Size(360, 72);
        map.addControl(new BMap.CityListControl({
            anchor: BMAP_ANCHOR_TOP_LEFT,
            offset: size,
