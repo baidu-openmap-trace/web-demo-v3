@@ -60,9 +60,9 @@ var EntityStore = Reflux.createStore({
         that.data.total = data.total;
         that.data.size = data.size;
         data.entities.map(function(item) {
-            var point = data.entities[0].realtime_point.location;
+            var point = data.entities[0].latest_location;
             var paramsGeo = {
-                location: point[1] + ',' + point[0],
+                location: point.latitude + ',' + point.longitude,
                 output: 'json'
             };
             Urls.jsonp(Urls.getAddress, paramsGeo, function(dataGeo) {
@@ -74,12 +74,12 @@ var EntityStore = Reflux.createStore({
                         temp[index]= item[keyitem] !== undefined ? [keyitem, item[keyitem]] : [keyitem, '无'];
                     }
                 });
-                // var location_desc = JSON.parse(item.realtime_point.location_desc);
+                // var location_desc = JSON.parse(item.latest_location.location_desc);
                 that.data.entities.push([
                     ['entity_name', item.entity_name],
                     ['create_time', item.create_time],
                     ['local_address', dataGeo.result.formatted_address === '' ? '无' : dataGeo.result.formatted_address,],
-                    ['loc_time', Commonfun.getLocalTime(item.realtime_point.loc_time)]
+                    ['loc_time', Commonfun.getLocalTime(item.latest_location.loc_time)]
                 ].concat(temp));
                 if (that.data.entities.length === that.data.size) {
                     that.trigger('list', that.getEntities());

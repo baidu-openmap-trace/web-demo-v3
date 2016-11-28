@@ -280,9 +280,9 @@ var TrackStore = Reflux.createStore({
             if (data.status === 0) {
                 data.entities.length = 1;
                 data.entities.map(function(item) {
-                    var point = data.entities[0].realtime_point.location;
+                    var point = data.entities[0].latest_location;
                     var paramsGeo = {
-                        location: point[1] + ',' + point[0],
+                        location: point.latitude + ',' + point.longitude,
                         output: 'json'
                     };
                     Urls.jsonp(Urls.getAddress, paramsGeo, function(dataGeo) {
@@ -297,16 +297,16 @@ var TrackStore = Reflux.createStore({
                         temp = temp.filter(function(item) {
                             return item;
                         });
-                        var lnglat = item.realtime_point.location[0].toFixed(2) + ',' + item.realtime_point.location[1].toFixed(2);
+                        var lnglat = item.latest_location.longitude.toFixed(2) + ',' + item.latest_location.latitude.toFixed(2);
                         that.data.selectCompleteEntities.push({
-                            point: [item.realtime_point.location[0], item.realtime_point.location[1]],
+                            point: [item.latest_location.longitude, item.latest_location.latitude],
                             entity_name: item.entity_name,
-                            direction:item.realtime_point.direction,
+                            direction:item.latest_location.direction,
                             infor: [
-                                ['状态:', Commonfun.getInfoWindowStatus(item.realtime_point.speed, item.realtime_point.loc_time, item.realtime_point.direction)],
+                                ['状态:', Commonfun.getInfoWindowStatus(item.latest_location.speed, item.latest_location.loc_time, item.latest_location.direction)],
                                 ['地址:', dataGeo.result.formatted_address === '' ? '无' : dataGeo.result.formatted_address],
                                 ['定位:', lnglat],
-                                ['时间:', Commonfun.getLocalTime(item.realtime_point.loc_time)]
+                                ['时间:', Commonfun.getLocalTime(item.latest_location.loc_time)]
                             ].concat(temp)
                         });
                         that.data.selectCompleteEntities[0].entity_status = entity_status;
@@ -341,9 +341,9 @@ var TrackStore = Reflux.createStore({
         }
         data.entities.map(function (item) {
             var desc = '';
-            if (Commonfun.getOnlineStatus(item.realtime_point.loc_time) === 0) {
-                item.realtime_point.speed = item.realtime_point.speed || 0;
-                desc = Commonfun.getSpeed(item.realtime_point.speed);
+            if (Commonfun.getOnlineStatus(item.latest_location.loc_time) === 0) {
+                item.latest_location.speed = item.latest_location.speed || 0;
+                desc = Commonfun.getSpeed(item.latest_location.speed);
                 descIndex = desc === '静止' ? 1 : 0;
             } else {
                 desc = '离线';
@@ -384,9 +384,9 @@ var TrackStore = Reflux.createStore({
         var descIndex = 0;
         data.entities.map(function (item) {
             var desc = '';
-            if (Commonfun.getOnlineStatus(item.realtime_point.loc_time) === 0) {
-                item.realtime_point.speed = item.realtime_point.speed || 0;
-                desc = Commonfun.getSpeed(item.realtime_point.speed);
+            if (Commonfun.getOnlineStatus(item.latest_location.loc_time) === 0) {
+                item.latest_location.speed = item.latest_location.speed || 0;
+                desc = Commonfun.getSpeed(item.latest_location.speed);
                 descIndex = desc === '静止' ? 1 : 0;
             } else {
                 desc = '离线';
@@ -427,9 +427,9 @@ var TrackStore = Reflux.createStore({
         var descIndex = 0;
         data.entities.map(function (item) {
             var desc = '';
-            if (Commonfun.getOnlineStatus(item.realtime_point.loc_time) === 0) {
-                item.realtime_point.speed = item.realtime_point.speed || 0;
-                desc = Commonfun.getSpeed(item.realtime_point.speed);
+            if (Commonfun.getOnlineStatus(item.latest_location.loc_time) === 0) {
+                item.latest_location.speed = item.latest_location.speed || 0;
+                desc = Commonfun.getSpeed(item.latest_location.speed);
                 descIndex = desc === '静止' ? 1 : 0;
             } else {
                 desc = '离线';
