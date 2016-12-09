@@ -500,6 +500,56 @@ var TrackStore = Reflux.createStore({
                                 that.trigger('tracklistloaded');
                                 that.data.tracklistloadedConunt = 0;
                             }
+                        } else if (datad.status === 3006) {
+
+                            var tempTimeArr = [];
+                            var partTime = Math.floor((that.data.end_time - that.data.start_time) / 6);
+                            for(var i = 0; i < 6; i++) {
+                                tempTimeArr[i] = {
+                                    start_time: that.data.start_time + i * partTime,
+                                    end_time: that.data.start_time + (i + 1) * partTime - 1,
+                                    index: i
+                                }
+                            }
+                            tempTimeArr[5].end_time = that.data.end_time;
+                            var distance_time = [{
+                                total: 0,
+                                distance: []
+                            }];
+                            tempTimeArr.map(function (item_time) {
+                                var param_time = {
+                                    'service_id': that.data.serviceId,
+                                    'start_time': item_time.start_time,
+                                    'end_time': item_time.end_time,
+                                    'entity_name': item.entity_name,
+                                    'simple_return': 2,
+                                    'is_processed': that.data.trackProcess.is_processed.toString(),
+                                    'process_option': 'need_denoise=' + that.data.trackProcess.need_denoise + ',' +
+                                                     'need_vacuate=' + that.data.trackProcess.need_vacuate + ',' +
+                                                     'need_mapmatch=' + that.data.trackProcess.need_mapmatch + ',' +
+                                                     'transport_mode=' + that.data.trackProcess.transport_mode
+                                };
+                                Urls.jsonp(Urls.trackList, param_time, function(data_time) {
+                                    if (data_time.status === 0) {
+                                        if (!distance_time[key]) {
+                                            distance_time[key] = {};
+                                            distance_time[key].total = 0;
+                                            distance_time[key].distance = [];
+                                        }
+                                        distance_time[key].distance.push(data_time.distance);
+                                        distance_time[key].total = distance_time[key].total + data_time.distance;
+                                        if (distance_time[key].distance.length === 6) {
+                                            var trackDistance = (distance_time[key].total / 1000).toFixed(1);
+                                            that.setTracklistDistance(trackDistance, item.entity_name);
+                                            that.trigger('tracklist', that.getTracklist());
+                                            if (++that.data.tracklistloadedConunt === that.data.trackListSize) {
+                                                that.trigger('tracklistloaded');
+                                                that.data.tracklistloadedConunt = 0;
+                                            }
+                                        }
+                                    }
+                                });
+                            });
                         } else {
                             var trackDistance = '数据异常';
                             that.setTracklistDistance(trackDistance, item.entity_name);
