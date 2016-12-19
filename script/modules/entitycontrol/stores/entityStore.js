@@ -60,7 +60,7 @@ var EntityStore = Reflux.createStore({
         that.data.total = data.total;
         that.data.size = data.size;
         data.entities.map(function(item) {
-            var point = data.entities[0].latest_location;
+            var point = item.latest_location;
             var paramsGeo = {
                 location: point.latitude + ',' + point.longitude,
                 output: 'json'
