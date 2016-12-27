@@ -1,6 +1,6 @@
 /**
- * @file ¹ì¼£²éÑ¯ÁÐ±í Reflux View
- * @author ´Þ½¡ cuijian03@baidu.com 2016.08.29
+ * @file 轨迹列表和绘制轨迹 Reflux View
+ * @author 崔健 cuijian03@baidu.com 2016.08.29
  */
 import React, { Component } from 'react'
 import { render } from 'react-dom'
@@ -12,20 +12,19 @@ import Trackpages from 'trackpages'
 var Trackcontent = React.createClass({
     getInitialState: function() {
         return {
-            // µ±Ç°ÁÐ±íÄÚÈÝ
+            // 轨迹列表
             trackList: [],
-            // µ±Ç°Ñ¡ÖÐ³µµÄ×ø±ê
+            // 当前选中轨迹
             currentTrack: {},
-            // ¿Õ°×ÁÐ±íÏî
+            // 空白entity列表，占位用
             blankEntityList: [],
-            // µ±Ç°Ñ¡ÖÐµÄentityname
+            // 当前选择的entity名
             currentEntityName: ''
         }
     },
     componentDidMount: function () {
         TrackStore.listen(this.onStatusChange);
         TrackAction.tracklist(1);
-        // this.listenTrackRoute();
     }, 
     onStatusChange: function (type,data) {
         switch (type){
@@ -38,9 +37,9 @@ var Trackcontent = React.createClass({
         }
     },
     /**
-     * ÏìÓ¦Store tracklistÊÂ¼þ£¬ÉèÖÃ¹ì¼£ÁÐ±í
+     * 响应Store tracklist事件，初始化历史轨迹列表
      *
-     * @param {data} ±êÇ©Ò³±êÊ¶
+     * @param {data} 轨迹数据
      */
     listenTrackList: function(data) {
         this.setState({trackList: data});
@@ -49,9 +48,9 @@ var Trackcontent = React.createClass({
         this.setState({blankEntityList: tempArray});
     },
     /**
-     * ÏìÓ¦Store trackrouteÊÂ¼þ£¬ÔÚµØÍ¼ÉÏ»æÖÆ¹ì¼£
+     * 响应Store trackroute事件，绘制选中的轨迹到地图上
      *
-     * @param {data} ¹ì¼£Êý¾Ý
+     * @param {data} 选中的轨迹详细数据
      */
     listenTrackRoute: function(data) {
         var that = this;
@@ -123,7 +122,7 @@ var Trackcontent = React.createClass({
                     
                 }            
             }
-            // Ìí¼ÓµÚÒ»¸öÆðµãºÍ×îºóÒ»¸öÖÕµã
+            // 绘制第一个起点和最后一个终点
 
             var imgStart = new Image();
             imgStart.src = __uri("/static/images/startpoint.png");
@@ -157,11 +156,11 @@ var Trackcontent = React.createClass({
         TrackAction.getstaypoint();
     },
     /**
-     * viewÄÚ²¿ ¸ù¾ÝËÙ¶È»ñÈ¡ÑÕÉ«
+     * view内部方法，根据速度获取对应的轨迹绘制颜色
      * 
-     * @param {number} speed ËÙ¶È
+     * @param {number} speed 速度
      *
-     * @return {string} ÑÕÉ«µÄÊ®Áù½øÖÆRGB
+     * @return {string} 颜色RGB字符串
      */
     getColorBySpeed: function(speed) {
         var color = '';
@@ -207,9 +206,9 @@ var Trackcontent = React.createClass({
         return color;
     },
     /**
-     * DOM²Ù×÷»Øµ÷£¬µã»÷Ñ¡ÖÐÒ»¸ö¹ì¼£
+     * DOM事件回掉，处理点击选中某条历史轨迹
      *
-     * @param {object} event ÊÂ¼þ¶ÔÏó 
+     * @param {object} event 事件对象
      */
     handleSelectTrack: function(event) {
         var realTarget = event.target;
