@@ -12,7 +12,7 @@
 2016.12.08:修复查看entity实时监控详情的bug  
 2016.12.09:修复少量用户因为轨迹点过多无法去噪抽稀的bug  
 2016.12.19:修复终端管理页面最后位置显示错误的bug  
-2016.12.27:修正了script/modules/trackcontrol/views/trackcontent.js的中文注释乱码
+2016.12.27:修正了script/modules/trackcontrol/views/trackcontent.js的中文注释乱码  
 2017.04.16:本次更新的项目很多，版本整体升级到了v3.2版本，功能上主要增加了：切换所有的接口为鹰眼Web API V3接口、添加动态查看视野范围内所有设备、支持拖动时间轴卡尺灵活查看轨迹、添加轨迹绑路交通方式选项、优化了历史轨迹的显示样式、支持历史轨迹点点击查看详细信息等等。可以参考这个帖子：http://bbs.lbsyun.baidu.com/forum.php?mod=viewthread&tid=119502&extra=page%3D1&page=1  
 
        
