@@ -1,6 +1,6 @@
 input::-ms-clear{display:none;}
 body{
-    background-color: #f5f5f5;
+    background-color: #f7f7f7;
     background-repeat: repeat-x;
     max-height: 800px;
     margin: 0;
@@ -27,7 +27,7 @@ abbr{
     width: 100%;
     margin: 0 auto;
     height: 100%;
-    background-color: #f5f5f5;
+    background-color: #f7f7f7;
 }
 
 .header{
@@ -144,7 +144,6 @@ abbr{
     border-right: 1px solid #e1eef6;
     background-color: #edf7ff;
     color: #2398ff;
-
 }
 
 .control{
@@ -187,7 +186,29 @@ abbr{
     text-decoration: none !important;
 }
 
-#myModal{
+#oneadd,
+#batchadd {
+    width: auto;
+}
+
+.formRadio {
+    float: left;
+}
+
+.formValue label {
+    line-height: 45px;
+    height: 100%;
+    display: inline-block;
+    font-size: 12px;
+    color: #333;
+    margin: 0 5px;
+}
+
+#myModal,
+#myServiceModal,
+#authaddModal,
+#customaddModal,
+#customtrackaddModal {
     border-radius: 0;
     width: 408px;
     margin-left: -204px;
@@ -214,14 +235,76 @@ abbr{
     cursor: pointer;
     float: right;
 }
-.addContent{
-    height: 150px;
+.addContent {
     margin-top: 20px;
     width: 100%;
     font-size: 12px;
     color: #333;
     overflow: auto;
 }
+
+#myModal #batchloading {
+    display: none;
+    height: 100%;
+    width: 409px;
+    position: absolute;
+    top: 0;
+    left: -1px;
+    /*margin: -25px 0 0 -25px;*/
+    background-color: #000;
+    opacity: .8;
+    z-index: 10;
+    background-size: 50px 50px;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-image: url(/static/images/batchloading.gif);
+}
+
+#myModal .addContent {
+    height: 240px;
+}
+
+#myModal .addContent textarea {
+    margin-top: 7px;
+    width: 240px;
+    height: 120px;
+    font-size: 12px;
+    padding: 8px 5px 0 5px;
+    line-height: 18px;
+}
+
+#myModal .formValue {
+    position: relative;
+}
+
+#myModal .addHelp {
+    /*height: 150px;*/
+    /*margin-top: 20px;*/
+    /*width: 100%;*/
+    padding: 15px;
+    font-size: 12px;
+    color: #333;
+    overflow: auto;
+}
+
+#myModal .other_provider {
+    position: absolute;
+    top: 2px;
+    left: 5px;
+    width: 210px;
+    border: none;
+    height: 28px;
+    box-shadow: none;
+}
+
+#myServiceModal .addContent {
+    height: 110px;
+}
+
+#authaddModal .addContent {
+    height: 150px;
+}
+
 .addForm{
     height: 45px;
     width: 100%
@@ -366,7 +449,12 @@ abbr{
 .tableMid{
     float: left;
 }
-.entityTable{
+.entityTable,
+.myservice_table,
+.otherservice_table,
+.auth_table,
+.system_table,
+.custom_table {
     table-layout:fixed;
     word-break:break-all;
     word-wrap:break-word; 
@@ -386,13 +474,13 @@ abbr{
 .entityList tr:hover{
     /*background-color: #333;*/
 }
-.entityList td{
+.entityList td {
     text-overflow: ellipsis; /* for IE */  
     -moz-text-overflow: ellipsis; /* for Firefox,mozilla */  
     overflow: hidden;  
     white-space: nowrap;  
-    border-bottom:1px dashed #eeeeee;
-    border-left:1px dashed #eeeeee;
+    border-bottom: 1px dashed #eee;
+    border-left: 1px dashed #eee;
     padding: 0;
     background-color: #fff;
     color: #000;
@@ -586,26 +674,45 @@ abbr{
     visibility:hidden;
 }
 
-.entityControl,.trackControl{
+.entityControl,
+.trackControl,
+.serviceControl,
+.servicemanageControl {
     position: absolute;
-    top:64px;
+    top: 64px;
     width: 100%;
 
 }
+
+.entityControl {
+    top: 0;
+    height: 100%;
+    overflow: auto;
+}
+
+.control {
+    margin-top: 64px;
+}
+
 .trackControl{
     height: 100%;
     top: 0;
 }
-.entityControl{
-    background-color: #f5f5f5;
+.entityControl,
+.serviceControl,
+.servicemanageControl {
+    background-color: #f7f7f7;
 }
 .map , .manage{
     position: absolute;
     width: 100%
 }
-.map{
+
+.map {
     height: 100%;
+    user-select: none;
 }
+
 .speedControl {
     height: 220px;
     width: 32px;
@@ -774,16 +881,10 @@ abbr{
     height: 100%;
     width: 320px;
     left: 1px;
-    background-color: white;
+    background-color: #fff;
 }
 
-.block{
-    display: block;
-}
 
-.blank{
-    display: none;
-}
 
 .extend{
     visibility: inherit;
@@ -905,7 +1006,7 @@ abbr{
     background-repeat: no-repeat;
     height: 34px;
     line-height: 35px;
-    border-bottom: 1px dashed #eeeeee;
+    border-bottom: 1px dashed #eee;
     font-size: 12px;
     cursor: pointer;
     background-size: 16px 14px;
@@ -980,8 +1081,32 @@ abbr{
     height: 110px;
     width: 100%;
     font-size: 12px;
-    overflow: auto;
+    overflow-y: scroll;
     -webkit-overflow-scrolling:touch;
+}
+
+::-webkit-scrollbar {
+    width: 9px;
+}
+
+::-webkit-scrollbar-track {
+    -webkit-border-radius: 5px;
+            border-radius: 5px;
+    background: rgba(0, 0, 0, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+    -webkit-border-radius: 5px;
+            border-radius: 5px;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.4);
+}
+
+::-webkit-scrollbar-thumb:window-inactive {
+    background: rgba(0, 0, 0, 0.05);
 }
 
 .carInfoItem{
@@ -1022,6 +1147,7 @@ abbr{
 }
 
 .infoZoomIn{
+    display: none;
     height: 100%;
     line-height: 40px;
     background-position: left center;
@@ -1120,7 +1246,7 @@ abbr{
     border-radius: 5px;
     background-color:rgba(255,255,255,0.8);
     right: 15px;
-    bottom: 15px;
+    bottom: 35px;
     box-shadow: 1px 1px 3px 1px #cbcbcb;
 }
 
@@ -1183,6 +1309,52 @@ abbr{
     cursor: pointer;
 }
 
+.timelineLabel {
+    position: absolute;
+    height: 30px;
+    width: 44px;
+    top: -33px;
+    margin-left:  -22px;
+    z-index: 20;
+}
+
+.caliperPartA,
+.caliperPartB {
+    position: absolute;
+    height: 100%;
+    top: 0;
+    background-color: rgba(40, 40, 40, 0.21);
+}
+
+.caliperPartA {
+    left: 0;
+}
+
+.caliperPartB {
+    right: 0;
+}
+
+.timelineLabelcontent {
+    width: 100%;
+    height: 25px;
+    background-color: rgba(0, 0, 0, 0.7);
+    border-radius: 2px;
+    color: #efefef;
+    line-height: 27px;
+    text-align: center;
+    font-size: 12px;
+}
+
+.timelineLabelpointer {
+    height: 0;
+    width: 0;
+    border: 6px solid rgba(0, 0, 0, 0.7);
+    border-right-color: transparent;
+    border-bottom-color: transparent;
+    border-left-color: transparent;
+    margin-left: 16px;
+}
+
 .timeHour{
     height: 6px;
     border-bottom: 1px solid #c2c2c4;
@@ -1194,6 +1366,61 @@ abbr{
     background-color: #c2c2c4;
 }
 
+.caliperA,
+.caliperB {
+    /*height: 100%;
+    width: 2px;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    background-color: #45a1f3;
+    margin-left: -9px;
+    position: absolute;
+    z-index: 5;
+    cursor: pointer;
+    background-clip: padding-box;*/
+    height: 60px;
+    position: absolute;
+    width: 20px;
+    margin-left: -10px;
+}
+
+.caliperPointerA,
+.caliperPointerB {
+    height: 0;
+    width: 0;
+    border: 10px solid #45a1f3;
+    border-right-color: transparent;
+    border-bottom-color: transparent;
+    border-left-color: transparent;
+    border-left-width: 10px;
+    border-right-width: 10px;
+    cursor: pointer;
+}
+
+.caliperPointerA {
+    margin-left: -9px;
+    border-right-color: #45a1f3;
+}
+
+.caliperPointerB {
+    margin-left: 9px;
+    border-left-color: #45a1f3;
+}
+
+.caliperLine {
+    height: 50px;
+    width: 2px;
+    margin: 0 auto;
+    background-color: #45a1f3;
+}
+
+.caliperA {
+    left: 0;
+}
+
+.caliperB {
+    left: 721px;
+}
 .timeHourFirst{
     border-bottom-left-radius: 3px;
     border-top-left-radius: 3px;
@@ -1228,6 +1455,7 @@ abbr{
     background-position: center;
     background-repeat: no-repeat;
     z-index: 10;
+    margin-left: -20px;
 }
 
 .runPart{
@@ -1247,29 +1475,34 @@ abbr{
     font-weight: bold;
 }
 
-.trackAnalysisHeader{
-    width: 301px;
-    height: 37px;
+.trackAnalysisHeader {
+    width: 300px;
+    height: 35px;
     float: left;
-    background: url('/static/images/analysisheader.png');
+    /*background: url('/static/images/analysisheader.png');*/
+    box-shadow: 1px 1px 2px 1px #cbcbcb;
+    background-color: #fff;
 }
 
-.trackAnalysisProcess, .trackAnalysisBehavior{
+.trackAnalysisProcess,
+.trackAnalysisBehavior {
     height: 85px;
-    width: 301px;
-    background: url('/static/images/analysisprocesscontent.png');
+    width: 300px;
+    /*background: url('/static/images/analysisprocesscontent.png');*/
+    box-shadow: 1px 1px 2px 1px #cbcbcb;
+    background-color: #fff;
     position: absolute;
     left: 0;
     top:40px;
     color: #333;
     font-size: 12px;
 }
-.trackAnalysisProcess{
-    height: 85px;
-    background: url('/static/images/analysisprocesscontent.png');
+.trackAnalysisProcess {
+    height: 105px;
+    /*background: url('/static/images/analysisprocesscontent.png');*/
 }
-.trackAnalysisBehavior{
-    background: url('/static/images/analysisbehaviorcontent.png');
+.trackAnalysisBehavior {
+    /*background: url('/static/images/analysisbehaviorcontent.png');*/
     height: 115px;
 }
 
@@ -1365,7 +1598,9 @@ abbr{
     background-repeat: no-repeat;
 }
 
-.processTile, .behaviorTile{
+.processTile,
+.behaviorTile,
+.bound_title {
     height: 20px;
     width: 70px;
     line-height: 20px;
@@ -1374,6 +1609,16 @@ abbr{
     margin-top: 12px;
     margin-left: 5px;
 }
+
+.optionsTitle {
+    height: 20px;
+    float: left;
+    width: 58px;
+    text-align: left;
+    line-height: 20px;
+
+}
+
 .behaviorTile{
     width: 95px;
 }
@@ -1407,26 +1652,35 @@ abbr{
 
 .processControl{
     float: left;
-    height: 25px;
-    width: 300px;
+    height: 16px;
+    width: 280px;
     margin-left: 15px;
-    margin-top: 10px;
+    margin-top: 14px;
 }
 
 .processControlItem{
     width: 75px;
-    line-height: 25px;
-    height: 25px;
+    line-height: 16px;
+    height: 16px;
     float: left;
 }
 
-.processControlItem label, .controlItemBot label{
+.processControlItem label,
+.controlItemBot label,
+.trafficMethodItem label {
     display: inline-block;
     margin: 0;
     font-size: 12px;
     text-indent: 9px;
-    line-height: 25px;
+    line-height: 16px;
     font-weight: bold;
+}
+
+.trafficMethodItem {
+    float: left;
+    width: 60px;
+    line-height: 16px;
+    height: 16px;
 }
 
 .behaviorControl{
@@ -1471,17 +1725,60 @@ abbr{
     margin-top: 1.5px;
 }
 
+.trackpoint_in {
+    height: 8px;
+    width: 8px;
+    background-color: #2398ff;
+    border-radius: 4px;
+    margin: 3px;
+}
+
+.trackpointOverlay .trackpoint_in {
+    display: none;
+}
+
+.trackpointonOverlay .trackpoint_in {
+    display: block;
+}
+
+.trackpointOverlay,
+.trackpointonOverlay {
+    /*cursor: pointer;*/
+    position: absolute;
+    z-index: 50;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: 12px 12px;
+    border-radius: 8px;
+}
+
+.trackpointOverlay {
+    height: 12px;
+    width: 12px;
+    /*background-image: url(/static/images/trackpoint.png);*/
+    background-color: #fff;
+    border: 2px solid #000;
+}
+
+.trackpointonOverlay {
+    height: 14px;
+    width: 14px;
+    background-color: #fff;
+    border: 1px solid #2398ff;
+    /*background-image: url(/static/images/trackpointon.png);*/
+}
+
 .behaviorOverlay{
     height: 20px;
     width: 20px;
     position: absolute;
-    z-index: 1;
+    z-index: 100;
     background-repeat: no-repeat;
     background-position: left center;
     border-radius: 10px;
     color:#333;
     font-size: 12px;
-    background-color: white;
+    background-color: #fff;
     line-height: 20px;
     text-indent: 22px;
     font-weight: bold;
@@ -1513,8 +1810,8 @@ abbr{
 .edit .editEntity{
     display: inline-block;
     width: 100%;
-    height: 100%;
-    border: 1px solid white;
+    height: 97%;
+    border: none;
     box-sizing: border-box;
     box-shadow: none;
     border-radius: 0;
@@ -1532,6 +1829,7 @@ abbr{
 .trunk{
     /*z-index: 0;*/
     position: absolute;
+    /*overflow: auto;*/
 }
 .branch{
     /*visibility: hidden;*/
@@ -1585,4 +1883,560 @@ abbr{
     /*margin-left: 480px;*/
     /*display: none;*/
     background-image: url('/static/images/databack_2x.png');
+}
+
+.qrdownload {
+    float: right;
+    width: 300px;
+    height: 100%;
+    text-align: center;
+    line-height: 62px;
+    cursor: pointer;
+    position: relative;
+    margin-right: 2.5%;
+}
+
+.qrdownload a {
+    color: #2398ff;
+    font-size: 16px;
+}
+
+#myModal2 {
+    border-radius: 0;
+    /*width: 408px;*/
+    margin-left: -161px;
+    top: 40%;
+    margin-top: -135px;
+    width: auto;
+    padding: 20px;
+}
+
+.qrcode_android {
+    height: 320px;
+    width: 280px;
+    background-size: 280px 280px;
+    background-repeat: no-repeat;
+    background-image: url(/static/images/qrcode_android.png);
+    background-position: center top;
+    vertical-align: bottom;
+    text-align: center;
+    line-height: 620px;
+    font-size: 26px;
+    font-weight: 700;
+}
+
+.qrdownload a:hover,
+.qrdownload a:active,
+.qrdownload a:visited,
+.qrdownload a:focus {
+    color: #2398ff !important;
+    text-decoration: none !important;
+    border: none !important;
+    outline-width: 0 !important;
+}
+
+
+
+/*service部分*/
+.myservicetop,
+.otherservicetop {
+    height: 70px;
+    width: 95%;
+    margin: 0 auto;
+}
+
+.myservicetitle,
+.otherservicetitle {
+    font-size: 18px;
+    height: 70px;
+    line-height: 70px;
+    color: #333;
+    text-align: left;
+    float: left;
+}
+
+.myservicecreate {
+    float: right;
+    height: 100%;
+    width: 200px;
+}
+
+.myservicecreate_btn {
+    text-indent: 20px;
+    color: #0a8cff;
+    font-size: 14px; 
+    width: 115px;
+    height: 32px;
+    float: right;
+    border: 1px solid #0a8cff;
+    margin-top: 21px;
+    cursor: pointer;
+    display: block;
+    line-height: 33px;
+    text-align: center;
+    border-radius: 4px;
+    background-color: #fff;
+    background-position: 16px center;
+    background-size: 13px 13px;
+    background-repeat: no-repeat;
+    background-image: url(/static/images/addicon.png);
+}
+
+.myservicecreate a:hover,
+.myservicecreate a:active,
+.myservicecreate a:visited {
+    color: #0a8cff !important;
+    text-decoration: none !important;
+    outline-width: 0 !important;
+}
+
+.myservicelist,
+.otherservicelist {
+    width: 95%;
+    overflow: auto;
+    margin: 0 auto;
+    box-shadow: 1px 2px 3px 1px #cbcbcb;
+}
+
+.myservicelist tr,
+.otherservicelist tr {
+    margin: 0;
+    padding: 0;
+}
+.myservicelist tr:hover,
+.otherservicelist tr:hover {
+    /*background-color: #333;*/
+}
+.myservicelist td,
+.otherservicelist td {
+    text-overflow: ellipsis; /* for IE */  
+    -moz-text-overflow: ellipsis; /* for Firefox,mozilla */  
+    overflow: hidden;  
+    white-space: nowrap;  
+    border-bottom: 1px dashed #eee;
+    padding: 0;
+    background-color: #fff;
+    color: #000;
+    font-size: 12px;
+    height: 38px;
+    text-align: center;
+}
+
+.myservicelist .thead,
+.otherservicelist .thead {
+    color: #fff;
+    background-color: #0a8cff;
+    /*border-left: 1px solid #2096ff;*/
+    border-bottom: none;
+}
+
+.myservicelist a,
+.otherservicelist a,
+.custom_table a,
+.auth_table a {
+    color: #0a8cff;
+    padding: 0 10px;
+    cursor: pointer;
+}
+
+.myservicelist a:hover,
+.otherservicelist a:hover {
+    text-decoration: underline;
+}
+
+.block {
+    display: block;
+}
+
+.blank {
+    display: none;
+}
+
+.text_center {
+    text-align: center;
+}
+
+.myservicelist tr .noservice,
+.myservicelist tr .nodevelop,
+.custom_table tr .nocustom {
+    font-size: 16px;
+}
+
+.otherservice {
+    margin-top: 50px;
+    margin-bottom: 20px;
+}
+
+.myservicelist .serviceindex1 {
+    text-indent: 0;
+}
+
+.myservicelistTr .editservice {
+    display: inline-block;
+    width: 100%;
+    height: 96%;
+    border: none;
+    box-sizing: border-box;
+    box-shadow: none;
+    border-radius: 0;
+    margin: 0;
+    padding: 0;
+    font-size: 12px;
+    color: #000;
+    cursor: text;
+    text-align: center;
+}
+
+.serviceControl {
+    /*display: none;*/
+}
+
+.servicemanageControl {
+    display: none;
+}
+
+.service_manage_title {
+    margin: 0 auto;
+    height: 73px;
+    width: 95%;
+}
+
+.backto_servicelist {
+    float: left;
+    cursor: pointer;
+    background-size: 32px 32px;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-image: url(/static/images/backto.png);
+    height: 100%;
+    width: 32px;
+}
+
+.service_manage_name {
+    float: left;
+    color: #333;
+    font-size: 18px;
+    line-height: 80px;
+    margin: 0 15px 0 5px;
+}
+
+.service_namang_info {
+    color: #0a8cff;
+    font-size: 12px;
+    line-height: 84px;
+    float: left;
+}
+
+.service_manage_content {
+    width: 95%;
+    overflow: auto;
+    margin: 0 auto;
+    box-shadow: 1px 2px 3px 1px #cbcbcb;
+    background-color: #fff;
+}
+
+.service_manage_tab {
+    height: 60px;
+    font-size: 14px;
+    color: #333;
+    border-bottom: 1px solid #d7d7d7;
+    margin: 0 35px 0 20px;
+}
+
+.service_manage_tab_item {
+    height: 59px;
+    float: left;
+    padding: 0 35px;
+    cursor: pointer;
+    line-height: 60px;
+}
+
+.service_manage_tab .service_manage_tab_item {
+    transition: none;
+    border: none;
+}
+
+.service_manage_tab .tabItem span:hover,
+.service_manage_tab .active {
+    border: none;
+    background-color: #fff;
+    border-bottom: 2px solid #2398ff;
+    color: #2398ff;
+}
+
+/*.service_manage_tab .service_manage_tab_item:hover {
+    border: none;
+    background-color: #fff;
+    border-bottom: 2px solid #2398ff;
+}*/
+
+.authControl,
+.trackfields,
+.entityfields,
+.serviceconfig {
+    margin: 0 35px 0 20px;
+    /*position: absolute;*/
+}
+
+
+.authControl tr,
+.system_table tr,
+.custom_table tr {
+    margin: 0;
+    padding: 0;
+    border-bottom: 1px dashed #eee;
+    border-left: 1px solid #eee;
+    border-right: 1px solid #eee;
+}
+
+.authControl td,
+.system_table td,
+.custom_table td {
+    text-overflow: ellipsis; /* for IE */  
+    -moz-text-overflow: ellipsis; /* for Firefox,mozilla */  
+    overflow: hidden;  
+    white-space: nowrap;  
+    border-left: 1px dashed #eee;
+    padding: 0;
+    background-color: #fff;
+    color: #333;
+    font-size: 12px;
+    height: 38px;
+    text-indent: 10px;
+    text-align: center;
+}
+
+.authControl tr:last-of-type,
+.system_table tr:last-of-type,
+.custom_table tr:last-of-type {
+    border-bottom: 1px solid #eee;
+}
+
+.authControl .thead,
+.system_table .thead,
+.custom_table .thead {
+    color: #333;
+    background-color: #f4f4f4;
+}
+
+.auth_table {
+    margin-top: 55px;
+}
+
+.authadd,
+.customadd {
+    height: 35px;
+    margin-top: 55px;
+}
+
+.customadd {
+    margin-top: 30px;
+}
+
+.authadd_btn,
+.customadd_btn {
+    text-indent: 20px;
+    color: #0a8cff;
+    font-size: 14px; 
+    width: 115px;
+    height: 32px;
+    float: left;
+    border: 1px solid #0a8cff;
+    cursor: pointer;
+    display: block;
+    line-height: 33px;
+    text-align: center;
+    border-radius: 4px;
+    background-color: #fff;
+    background-position: 16px center;
+    background-size: 13px 13px;
+    background-repeat: no-repeat;
+    background-image: url(/static/images/addicon.png);
+}
+
+.customadd_btn {
+    width: 155px;
+}
+
+.authadd a:hover,
+.authadd a:active,
+.authadd a:visited {
+    color: #0a8cff !important;
+    text-decoration: none !important;
+    outline-width: 0 !important;
+}
+
+.auth_explain {
+    margin-top: 85px;
+    margin-bottom: 20px;
+    color: #333;
+    font-size: 12px;
+}
+
+.systemtitle,
+.custumtitle,
+.entitydesctitleConfig {
+    margin: 30px 0 10px 0;
+    font-size: 14px;
+    color: #333;
+}
+
+.entityfieldsexplain,
+.trackfieldsexplain {
+    margin-top: 85px;
+    margin-bottom: 20px;
+    color: #333;
+    font-size: 12px;
+}
+.entityfieldsexplain a,
+.trackfieldsexplain a {
+    color: #0a8cff;
+}
+
+#customaddModal .addContent {
+    height: 200px;
+}
+
+#customtrackaddModal .addContent {
+    height: 160px;
+}
+
+.entitydescitem {
+    float: left;
+    margin-left: 40px;
+}
+
+.entitydescitemline1 input,
+.entitydescitemline1 label {
+    display: inline-block;
+}
+
+.entitydescitemline1 label {
+    margin-left: 10px;
+    font-size: 12px;
+}
+
+#entitydescpic {
+    background-repeat: no-repeat;
+    background-image: url(/static/images/entitydesc.png);
+    background-size: 280px 395px;
+    height: 395px;
+    width: 280px;
+}
+
+#entitynamepic {
+    background-repeat: no-repeat;
+    background-image: url(/static/images/entityname.png);
+    background-size: 280px 395px;
+    height: 395px;
+    width: 280px;
+}
+
+.entitydescConfig {
+    width: 100%;
+    float: left;
+}
+.entitydesccontentConfig {
+    float: left;
+    width: 100%;
+    height: 440px;
+}
+
+.rateConfig {
+    float: left;
+    width: 100%;
+    height: 80px;
+}
+
+.rateConfigItem {
+    margin-left: 40px;
+}
+
+.rateConfigItem,
+.rateConfigTitle,
+.rateContent,
+.rateInput,
+.rateedit,
+.rateensure {
+    float: left;
+    height: 30px;
+    line-height: 30px;
+    font-size: 12px;
+}
+
+.rateContent,
+.rateInput {
+    width: 55px;
+}
+
+.rateInput input {
+    width: 45px;
+    font-size: 12px;
+}
+
+.rateedit,
+.rateensure {
+    margin-left: 10px;
+    background-repeat: no-repeat;
+    background-size: 28px 28px;
+    background-position: center center;
+    width: 30px;
+    cursor: pointer;
+}
+
+.rateedit {
+    background-image: url(/static/images/editbtn.png);
+}
+
+.rateensure {
+    background-image: url(/static/images/ensurebtn.png);
+}
+
+.boundcontrol {
+    width: 150px;
+    height: 70px;
+    padding: 0 10px;
+    box-shadow: 1px 1px 2px 1px #cbcbcb;
+    background-color: #fff;
+    position: absolute;
+    top: 72px;
+    right: 15px;
+    font-size: 12px;
+}
+
+.boundsearch_total {
+    height: 35px;
+    line-height: 35px;
+    width: 150px;
+    text-align: left;
+    float: left;
+}
+
+.boundsearch_title {
+    height: 20px;
+    width: 70px;
+    line-height: 20px;
+    text-align: left;
+    float: left;
+    margin-top: 10px;
+}
+
+.boundOn,
+.boundOff {
+    width: 46px;
+    height: 20px;
+    margin-top: 9px;
+    float: left;
+    cursor: pointer;
+    background-size: 46px 20px;
+    background-repeat: no-repeat;
+    background-repeat: no-repeat;
+}
+
+.boundOn {
+    background-image: url(/static/images/analysison.png);
+}
+
+.boundOff {
+    background-image: url(/static/images/analysisoff.png);
 }

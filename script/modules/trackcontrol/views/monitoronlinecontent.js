@@ -125,8 +125,11 @@ var Monitoronlinecontent = React.createClass({
         }
         var entity_name = realTarget.getAttribute('data-entity_name');
         var entity_status = realTarget.getAttribute('data-entity_status');
+        // $('.monitorListItem0, .monitorListItem1, .monitorListItem2').removeClass('monitorSelect');
+        // $(realTarget).addClass('monitorSelect');
+        var entity_id = realTarget.getAttribute('data-entity_id');
         this.setState({currentEntityName: entity_name});
-        TrackAction.selectcar(entity_name, entity_status, 'onlineCompleteEntities');
+        TrackAction.selectcar(entity_name, entity_status, entity_id, 'onlineCompleteEntities');
     },
     render: function() {
         var monitorTabIndex = this.state.monitorTabIndex;
@@ -140,8 +143,8 @@ var Monitoronlinecontent = React.createClass({
                     {
                         allEntity.map(function(item, key) {
                             return (
-                                <div className={'monitorListItem' + item[2] + ((currentEntityName === item[0]) ? ' monitorSelect' : '')} key={key} data-entity_name={item[0]} data-entity_status={item[2]} onClick={handleSelectCar}>
-                                    <div className="monitorListItemName"><abbr title={item[0]}>{item[0]}</abbr></div>
+                                <div className={'monitorListItem' + item[2] + ((currentEntityName === item[0]) ? ' monitorSelect' : '')} key={key} data-entity_name={item[0]} data-entity_status={item[2]} data-entity_id={item[3]} onClick={handleSelectCar}>
+                                    <div className="monitorListItemName"><abbr title={item[5]}>{item[5]}</abbr></div>
                                     <div className="monitorListItemSpeed">{item[1]}</div>
                                 </div>
                                 )

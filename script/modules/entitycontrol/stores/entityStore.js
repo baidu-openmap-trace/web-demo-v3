@@ -1,3 +1,5 @@
+/* globals Reflux */
+/* eslint-disable fecs-camelcase */
 /**
  * @file 设备管理台Reflux Store
  * @author 崔健 cuijian03@baidu.com 2016.08.20
@@ -19,7 +21,7 @@ var EntityStore = Reflux.createStore({
         // entity完整数据
         entities: [],
         // entity的固定默认列名
-        column: ['名称', '创建时间', '最后位置', '最后定位时间'],
+        column: ['名称', '描述', '创建时间', '最后位置', '最后定位时间'],
         // entity的自定义列的key
         column_key: [],
         // entity的自定义列的desc
@@ -42,6 +44,10 @@ var EntityStore = Reflux.createStore({
             {
                 key: 24,
                 value: '深圳博实结科技'
+            },
+            {
+                key: 25,
+                value: '深圳成为智能交通'
             },
             {
                 key: 22,
@@ -67,16 +73,19 @@ var EntityStore = Reflux.createStore({
             };
             Urls.jsonp(Urls.getAddress, paramsGeo, function(dataGeo) {
                 var temp = [];
-                that.data.column_key.map(function(keyitem, index) { 
+                that.data.column_key.map(function(keyitem, index) {
+                    temp[index]= item[keyitem] !== undefined ? [keyitem, item[keyitem]] : [keyitem, '无'];
                     if (keyitem === '_provider') {
-                        temp[index] = ['_provider', '1'];
-                    } else {
-                        temp[index]= item[keyitem] !== undefined ? [keyitem, item[keyitem]] : [keyitem, '无'];
+                        that.data.providerArr.map(function(itemin) {
+                            if(itemin.key + '' === temp[index][1]) {
+                                temp[index] = ['_provider',  itemin.value];
+                            }
+                        });
                     }
                 });
-                // var location_desc = JSON.parse(item.latest_location.location_desc);
                 that.data.entities.push([
                     ['entity_name', item.entity_name],
+                    ['entity_desc', item.entity_desc ? item.entity_desc : '无'],
                     ['create_time', item.create_time],
                     ['local_address', dataGeo.result.formatted_address === '' ? '无' : dataGeo.result.formatted_address,],
                     ['loc_time', Commonfun.getLocalTime(item.latest_location.loc_time)]
@@ -86,7 +95,6 @@ var EntityStore = Reflux.createStore({
                     that.trigger('listcomplete', that.data.size);
                 }
             });
-            
         });
     },
     /**
@@ -125,13 +133,14 @@ var EntityStore = Reflux.createStore({
             }
         }.bind(this));
     },
+
     /**
-     * store内部 将自定义字段中的provider字段删除
+     * store内部 将自定义字段中的provider字段提到最前
      *
      * @param {array} column 自定义字段
      * @return {array} 新的数组
      */
-     formatColumn: function(columns) {
+    formatColumn: function(columns) {
         var providerIndex = columns.findIndex(function(value, index, array) {
             return value.column_key === '_provider';
         });
@@ -140,9 +149,10 @@ var EntityStore = Reflux.createStore({
                 return value.column_key === '_provider';
             });
             columns.splice(providerIndex, 1);
+            columns.unshift(provider);
         }
         return columns;
-     },
+    },
     /**
      * 响应Action listcolumn，查询当前service_id的自定义字段
      *

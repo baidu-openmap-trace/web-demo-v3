@@ -83,8 +83,14 @@ var TrackStore = Reflux.createStore({
             is_processed: '0',
             need_denoise: '1',
             need_vacuate: '1',
-            need_mapmatch: '0'
+            need_mapmatch: '0',
+            transport_mode: '1'
         },
+        transport_mode: [
+            'driving',
+            'riding',
+            'walking'
+        ],
         // 异步加载的驾驶分析排序数据
         trackBehaviorSortData: [],
         // 实际返回给view的驾驶分析数据
@@ -100,7 +106,26 @@ var TrackStore = Reflux.createStore({
         searchingAll: 0,
         searchingOnline: 0,
         searchingOffline: 0,
-        selectCompleteEntities:[]
+        selectCompleteEntities: [],
+        // 按bound查找entity
+        boundsEntity: [],
+        // bound检索计数
+        boundsEntityCount: 0,
+        // 当前显示bound检索类型
+        // 用户在切换全部，在线，离线时进行修改，bounds检索对应状态下的entity
+        boundsType: 'all',
+        // 是否开启范围检索
+        switchBounds: false,
+        // 当前的管理项，分为实时监控和轨迹查询
+        managetab: 0,
+        // boundsearch的时间戳
+        boundsearchTimestamp: 0,
+        // 三种类型的entity的total
+        entityTotal: {
+            all: 0,
+            online: 0,
+            offline: 0
+        }
     },
     /**
      * 响应Action switchtab，变更页签
@@ -108,6 +133,7 @@ var TrackStore = Reflux.createStore({
      * @param {number} index 要变更到的tab
      */
     onSwitchmanagetab: function(index) {
+        this.data.managetab = index;
         this.trigger('switchmanagetab', index);
     },
     onGetservicename: function() {
@@ -121,7 +147,20 @@ var TrackStore = Reflux.createStore({
      * @param {number} index 要变更到的tab
      */
     onSwitchmonitortab: function(index) {
+        let that = this;
+        switch (index) {
+            case 0:
+                that.data.boundsType = 'all';
+                break;
+            case 1:
+                that.data.boundsType = 'online';
+                break;
+            case 2:
+                that.data.boundsType = 'offline';
+                break;
+        }
         this.trigger('switchmonitortab', index);
+        this.onBoundsearchentity();
     },
     /**
      * 响应Action searchallentity，查询所有entity
@@ -149,6 +188,7 @@ var TrackStore = Reflux.createStore({
             if (data.status === 0) {
                 that.setAllEntities(data);
                 that.setallCompleteEntities(data);
+                that.data.entityTotal.all = data.total;
                 this.trigger('totalall', data.total);
                 var allpage = Math.ceil(data.total / 10);
                 this.trigger('totalallpage', allpage);
@@ -188,6 +228,7 @@ var TrackStore = Reflux.createStore({
             if (data.status === 0) {
                 that.setOfflineEntities(data);
                 that.setOfflineCompleteEntities(data);
+                that.data.entityTotal.offline = data.total;
                 this.trigger('totaloffline', data.total);
                 this.trigger('totalofflinepage', Math.ceil(data.total / 10));
                 that.data.searchingOffline = 0;
@@ -226,6 +267,7 @@ var TrackStore = Reflux.createStore({
             if (data.status === 0) {
                 that.setOnlineEntities(data);
                 that.setonlineCompleteEntities(data);
+                that.data.entityTotal.online = data.total;
                 this.trigger('totalonline', data.total);
                 this.trigger('totalonlinepage', Math.ceil(data.total / 10));
                 that.data.searchingOnline = 0;
@@ -258,18 +300,243 @@ var TrackStore = Reflux.createStore({
 
         }.bind(this));
     },
+
+    /**
+     * 响应Action switchboundsearch 控制是否默认进行boundsearch
+     *
+     * @param {boolean} data 是否进行boundsearch
+     */
+    onSwitchboundsearch(data) {
+        this.data.switchBounds = data;
+        this.onBoundsearchentity();
+    },
+
+    /**
+     * 响应Action boundsearchentity 返回当前地图区域的entity
+     *
+     * @param {boolean} display 如果传false那么则直接返回空数据
+     */
+    onBoundsearchentity(display) {
+        let that = this;
+        let time = new Date();
+        that.data.boundsearchTimestamp = time.getTime();
+        let inTimestamp = that.data.boundsearchTimestamp;
+        let inBoundsEntity = [];
+        let inBoundsEntityCount = 0;
+        let total = 0;
+        const boundsLimit = 400000;
+        let bounds = map.getBounds();
+        let center = bounds.getCenter();
+        let northEast = bounds.getNorthEast();
+        let southWest = bounds.getSouthWest();
+        let page_size = map.getZoom() * 10;
+        const width = 3;
+        const height = 3;
+        let boundsDistance = map.getDistance(northEast, southWest);
+        if (!this.data.switchBounds || display === false || this.data.managetab === 1) {
+            that.trigger('boundsearchDec', '当前视野设备数量');
+            that.trigger('boundsearchentitytotal', 0);
+            that.trigger('boundsearchentity', []);
+            return;
+        }
+        
+        let boundsArr = [];
+
+        // 把屏幕分为 width * height 个区域，分别调用boundsearch加载车辆数据
+        let lngLatToPoint = function (lnglat) {
+            return map.getMapType().getProjection().lngLatToPoint(lnglat);
+        };
+        let pointToLngLat = function (point) {
+            return map.getMapType().getProjection().pointToLngLat(point);
+        };
+        let pixelNorthEast = lngLatToPoint(northEast);
+        let pixelSouthWest = lngLatToPoint(southWest);
+        let widthUnit = (pixelNorthEast.x - pixelSouthWest.x) / width;
+        let heightUnit = (pixelNorthEast.y - pixelSouthWest.y) / height;
+        for (let i = 0; i < width; i++) {
+            for (let j = 0; j < height; j++) {
+                let leftButtom = pointToLngLat(new BMap.Pixel(pixelSouthWest.x + widthUnit * i, pixelSouthWest.y + heightUnit * j));
+                let rightTop = pointToLngLat(new BMap.Pixel(pixelSouthWest.x + widthUnit * (i + 1), pixelSouthWest.y + heightUnit * (j + 1)));
+                boundsArr.push(leftButtom.lat + ',' + leftButtom.lng + ';' + rightTop.lat + ',' + rightTop.lng);
+            }
+        }
+        let filter = '';
+        switch (that.data.boundsType) {
+            case 'all':
+                filter = '';
+                break;
+            case 'online':
+                filter = 'active_time:' + that.data.onlineTime;
+                break;
+            case 'offline':
+                filter = 'inactive_time:' + that.data.onlineTime;
+                break;
+        }
+
+        let getBoundsearchResultTable = function () {
+            boundsArr.map(function (item, index) {
+                let params = {
+                    'bounds': item,
+                    'filter': filter,
+                    'page_size': page_size
+                };
+                Urls.jsonp(Urls.boundsearchEntity, params, function (data) {
+                    if (data.status === 0) {
+                        data.entities.map(function (eitem, eindex) {
+                            let status = '';
+                            let entity_status = 0;
+                            if (Commonfun.getOnlineStatus(eitem.latest_location.loc_time) === 0) {
+                                eitem.latest_location.speed = eitem.latest_location.speed || 0;
+                                status = Commonfun.getSpeed(eitem.latest_location.speed);
+                                entity_status = status === '静止' ? 1 : 0;
+                            } else {
+                                entity_status = 2;
+                                status = '离线';
+                            }
+                            inBoundsEntity.push({
+                                entity_name: eitem.entity_name,
+                                point: [eitem.latest_location.longitude, eitem.latest_location.latitude],
+                                direction: eitem.latest_location.direction,
+                                status: status,
+                                entity_status: entity_status
+                            });
+
+
+                        });
+                        total = total + data.total;
+                    }
+                    if (++inBoundsEntityCount === width * height && inTimestamp === that.data.boundsearchTimestamp) {
+                        that.trigger('boundsearchentity', inBoundsEntity);
+                        that.trigger('boundsearchDec', '当前视野设备数量');
+                        that.trigger('boundsearchentitytotal', total);
+                    }
+                });
+            });
+        };
+        let getBoundsearchResultOnce = function (page_index) {
+            let temp = southWest.lat + ',' + southWest.lng + ';' + northEast.lat + ',' + northEast.lng;
+            let params = {
+                'bounds': temp,
+                'filter': filter,
+                'page_index': page_index,
+                'page_size': 1000
+            };
+            Urls.jsonp(Urls.boundsearchEntity, params, function (data) {
+                if (inTimestamp !== that.data.boundsearchTimestamp) {
+                    return;
+                }
+                if (data.status === 3003) {
+                    that.trigger('boundsearchDec', '当前视野设备数量');
+                    that.trigger('boundsearchentitytotal', 0);
+                    that.trigger('boundsearchentity', []);
+                    return;
+                }
+                if (data.status === 0) {
+                    that.trigger('boundsearchDec', '当前视野设备数量');
+                    that.trigger('boundsearchentitytotal', data.total);
+                    if (data.total > 5000) {
+                        getBoundsearchResultTable();
+                        return;
+                    }
+                    data.entities.map(function (eitem, eindex) {
+                        let status = '';
+                        let entity_status = 0;
+                        if (Commonfun.getOnlineStatus(eitem.latest_location.loc_time) === 0) {
+                            eitem.latest_location.speed = eitem.latest_location.speed || 0;
+                            status = Commonfun.getSpeed(eitem.latest_location.speed);
+                            entity_status = status === '静止' ? 1 : 0;
+                        } else {
+                            entity_status = 2;
+                            status = '离线';
+                        }
+                        inBoundsEntity.push({
+                            entity_name: eitem.entity_name,
+                            point: [eitem.latest_location.longitude, eitem.latest_location.latitude],
+                            direction: eitem.latest_location.direction,
+                            status: status,
+                            entity_status: entity_status
+                        });
+                    });
+                    if (inBoundsEntity.length !== data.total) {
+                        getBoundsearchResultOnce(page_index + 1);
+                    } else {
+                        that.trigger('boundsearchentity', inBoundsEntity);
+                    }
+                }
+            });
+        };
+        // 划分成width * height 区域后仍然超过后端检索距离限制，则调用search检索
+        if (boundsDistance > width * boundsLimit) {
+            let tempData = [];
+            let tempCount = 0;
+            let tempTotal = that.data.entityTotal[that.data.boundsType];
+            let page = Math.ceil(tempTotal / (map.getZoom() * 20));
+            // return;
+            let j = page >= 3 ? 3 : page;
+            for (let i = 0; i < j; i = i + 1) {
+                let page_index = Math.ceil(i * 0.5 * page) + 1;
+                let params = {
+                    'filter': filter,
+                    'page_index': page_index,
+                    'page_size': map.getZoom() * 20,
+                    'sortby': 'loc_time:desc'
+                };
+                Urls.jsonp(Urls.searchEntity, params, function (data) {
+                    if (inTimestamp !== that.data.boundsearchTimestamp) {
+                        return;
+                    }
+                    if (data.status === 0) {
+                        data.entities.map(function (eitem, eindex) {
+                            let status = '';
+                            let entity_status = 0;
+                            if (Commonfun.getOnlineStatus(eitem.latest_location.loc_time) === 0) {
+                                eitem.latest_location.speed = eitem.latest_location.speed || 0;
+                                status = Commonfun.getSpeed(eitem.latest_location.speed);
+                                entity_status = status === '静止' ? 1 : 0;
+                            } else {
+                                entity_status = 2;
+                                status = '离线';
+                            }
+                            tempData.push({
+                                entity_name: eitem.entity_name,
+                                point: [eitem.latest_location.longitude, eitem.latest_location.latitude],
+                                direction: eitem.latest_location.direction,
+                                status: status,
+                                entity_status: entity_status
+                            });
+                        });
+                        if (++tempCount === j) {
+                            that.trigger('boundsearchDec', '当前类型设备数量');
+                            that.trigger('boundsearchentitytotal', data.total);
+                            that.trigger('boundsearchentity', tempData);
+                        }
+                    }
+                });
+            }
+            return;
+        }
+        if (boundsDistance < boundsLimit) {
+            getBoundsearchResultOnce(1);
+        } else {
+            getBoundsearchResultTable();
+        }
+    },
+
     /**
      * 响应Action selectallcar 返回选中车辆具体信息
      *
      */
-    onSelectcar: function(entity_name, entity_status, entity_type) {
+    onSelectcar: function(entity_name, entity_status, entity_id) {
         var that = this;
         if(that.data.selectCar.entity_name === undefined && entity_name === undefined) {
             return;
         }
+        let interval = false;
+        if (that.data.selectCar.entity_name !== undefined && entity_name === undefined) {
+            interval = true;
+        }
         entity_name = entity_name || that.data.selectCar.entity_name;
-        entity_status = entity_status || that.data.selectCar.entity_status;
-        entity_type = entity_type || that.data.selectCar.entity_type;
+        entity_status = entity_status !== undefined ? entity_status : that.data.selectCar.entity_status;
         that.data.selectCompleteEntities = [];
         var params = {
             'query': entity_name,
@@ -278,7 +545,7 @@ var TrackStore = Reflux.createStore({
 
         Urls.jsonp(Urls.searchEntity, params, function(data) {
             if (data.status === 0) {
-                data.entities.map(function(item) {
+                data.entities.map(function(item, index) {
                     if (item.entity_name === entity_name) {
                         var point = data.entities[0].latest_location;
                         var paramsGeo = {
@@ -297,22 +564,42 @@ var TrackStore = Reflux.createStore({
                             temp = temp.filter(function(item) {
                                 return item;
                             });
-                            var lnglat = item.latest_location.longitude.toFixed(2) + ',' + item.latest_location.latitude.toFixed(2);
-                            that.data.selectCompleteEntities.push({
+                            var lnglat = item.latest_location.longitude.toFixed(6) + ',' + item.latest_location.latitude.toFixed(6);
+                            var address = '地址未解析成功';
+                            if (dataGeo.result.formatted_address !== '') {
+                                address = dataGeo.result.formatted_address;
+                            } else {
+                                address = dataGeo.result.addressComponent.city + ', ' + location_desc.result.addressComponent.country;
+                            }
+                            that.data.selectCompleteEntities[index] = {
                                 point: [item.latest_location.longitude, item.latest_location.latitude],
-                                entity_name: item.entity_name,
                                 direction:item.latest_location.direction,
+                                status: Commonfun.getInfoWindowStatus(item.latest_location.speed, item.latest_location.loc_time, item.latest_location.direction),
                                 infor: [
                                     ['状态:', Commonfun.getInfoWindowStatus(item.latest_location.speed, item.latest_location.loc_time, item.latest_location.direction)],
-                                    ['地址:', dataGeo.result.formatted_address === '' ? '无' : dataGeo.result.formatted_address],
+                                    ['地址:', address],
                                     ['定位:', lnglat],
                                     ['时间:', Commonfun.getLocalTime(item.latest_location.loc_time)]
                                 ].concat(temp)
-                            });
-                            that.data.selectCompleteEntities[0].entity_status = entity_status;
-                            that.data.selectCompleteEntities[0].entity_type = entity_type;
-                            that.data.selectCar = that.data.selectCompleteEntities[0];
-                            that.trigger('selectcardata',that.data.selectCompleteEntities[0]);
+                            };
+
+                            // 从localstorage中获取应该显示到列表中的字段，entitydesc或者entityname
+                            let entityOption = localStorage['entityOption' + that.data.serviceId];
+                            if (entityOption === 'byname' || entityOption === undefined) {
+                                that.data.selectCompleteEntities[index]['entity_print'] = item.entity_name;
+                                if (!!item.entity_desc) {
+                                    that.data.selectCompleteEntities[index]['infor'].unshift(['描述', item.entity_desc]);
+                                }
+                            } else if (entityOption === 'bydesc') {
+                                that.data.selectCompleteEntities[index]['entity_print'] = item.entity_desc ? item.entity_desc : '无';
+                                that.data.selectCompleteEntities[index]['infor'].unshift(['名称', item.entity_name]);
+                            }
+                            that.data.selectCompleteEntities[index]['entity_name'] = item.entity_name;
+                            that.data.selectCompleteEntities[index].entity_status = entity_status;
+                            that.data.selectCar = that.data.selectCompleteEntities[index];
+                            // 对计时器触发的entity选中进行识别，添加标识，方便view层做处理
+                            that.data.selectCompleteEntities[index].interval = interval;
+                            that.trigger('selectcardata',that.data.selectCompleteEntities[index]);
                         });
                     }  
                 });
@@ -322,6 +609,15 @@ var TrackStore = Reflux.createStore({
             }
         }.bind(this));
     },
+
+    /**
+     * 响应Action closemonitorinfobox 关闭实时监控中的infobox
+     *
+     */
+    onClosemonitorinfobox() {
+        this.data.selectCar.entity_name = undefined;
+    },
+
     /**
      * 响应Action hideselectcar 返回选中车辆具体信息
      *
@@ -340,7 +636,7 @@ var TrackStore = Reflux.createStore({
         if (data.length === 0) {
             return;
         }
-        data.entities.map(function (item) {
+        data.entities.map(function (item, index) {
             var desc = '';
             if (Commonfun.getOnlineStatus(item.latest_location.loc_time) === 0) {
                 item.latest_location.speed = item.latest_location.speed || 0;
@@ -350,11 +646,25 @@ var TrackStore = Reflux.createStore({
                 desc = '离线';
                 descIndex = 2;
             }
-            that.data.allEntities.push([
+            that.data.allEntities[index] = [
+                // item.entity_desc ? item.entity_desc : item.entity_name,
                 item.entity_name,
                 desc,
-                descIndex
-            ]);
+                descIndex,
+                '',
+                item.entity_desc ? item.entity_desc : '无'
+            ];
+            // 为managerdemo添加特殊识别字段entity_id
+            if (!!item.entity_id) {
+                that.data.allEntities[index][3] = item.entity_id;
+            }
+            // 从localstorage中获取应该显示到列表中的字段，entitydesc或者entityname
+            let entityOption = localStorage['entityOption' + that.data.serviceId];
+            if (entityOption === 'byname' || entityOption === undefined) {
+                that.data.allEntities[index][5] = item.entity_name;
+            } else if (entityOption === 'bydesc') {
+                that.data.allEntities[index][5] = item.entity_desc ? item.entity_desc : '无';
+            }
         });
     },
     /**
@@ -383,7 +693,7 @@ var TrackStore = Reflux.createStore({
             return;
         }
         var descIndex = 0;
-        data.entities.map(function (item) {
+        data.entities.map(function (item, index) {
             var desc = '';
             if (Commonfun.getOnlineStatus(item.latest_location.loc_time) === 0) {
                 item.latest_location.speed = item.latest_location.speed || 0;
@@ -393,11 +703,26 @@ var TrackStore = Reflux.createStore({
                 desc = '离线';
                 descIndex = 2;
             }
-            that.data.offlineEntities.push([
+            that.data.offlineEntities[index] = [
+                // item.entity_desc ? item.entity_desc : item.entity_name,
                 item.entity_name,
                 desc,
-                descIndex
-            ]);
+                descIndex,
+                '',
+                item.entity_desc ? item.entity_desc : '无'
+
+            ];
+            // 为managerdemo添加特殊识别字段entity_id
+            if (!!item.entity_id) {
+                that.data.offlineEntities[index][3] = item.entity_id;
+            }
+            // 从localstorage中获取应该显示到列表中的字段，entitydesc或者entityname
+            let entityOption = localStorage['entityOption' + that.data.serviceId];
+            if (entityOption === 'byname' || entityOption === undefined) {
+                that.data.offlineEntities[index][5] = item.entity_name;
+            } else if (entityOption === 'bydesc') {
+                that.data.offlineEntities[index][5] = item.entity_desc ? item.entity_desc : '无';
+            }
         });
     },
     /**
@@ -426,7 +751,7 @@ var TrackStore = Reflux.createStore({
             return;
         }
         var descIndex = 0;
-        data.entities.map(function (item) {
+        data.entities.map(function (item, index) {
             var desc = '';
             if (Commonfun.getOnlineStatus(item.latest_location.loc_time) === 0) {
                 item.latest_location.speed = item.latest_location.speed || 0;
@@ -436,11 +761,25 @@ var TrackStore = Reflux.createStore({
                 desc = '离线';
                 descIndex = 2;
             }
-            that.data.onlineEntities.push([
+            that.data.onlineEntities[index] = [
+                // item.entity_desc ? item.entity_desc : item.entity_name,
                 item.entity_name,
                 desc,
-                descIndex
-            ]);
+                descIndex,
+                '',
+                item.entity_desc ? item.entity_desc : '无'
+            ];
+            // 为managerdemo添加特殊识别字段entity_id
+            if (!!item.entity_id) {
+                that.data.onlineEntities[index][3] = item.entity_id;
+            }
+            // 从localstorage中获取应该显示到列表中的字段，entitydesc或者entityname
+            let entityOption = localStorage['entityOption' + that.data.serviceId];
+            if (entityOption === 'byname' || entityOption === undefined) {
+                that.data.onlineEntities[index][5] = item.entity_name;
+            } else if (entityOption === 'bydesc') {
+                that.data.onlineEntities[index][5] = item.entity_desc ? item.entity_desc : '无';
+            }
         });
     },
     /**
@@ -485,13 +824,13 @@ var TrackStore = Reflux.createStore({
                        'start_time': that.data.start_time,
                        'end_time': that.data.end_time,
                        'entity_name': item.entity_name,
-                       'simple_return': 2,
                        'is_processed': that.data.trackProcess.is_processed.toString(),
-                       'process_option': 'need_denoise=' + that.data.trackProcess.need_denoise + ',' +
-                                         'need_vacuate=' + that.data.trackProcess.need_vacuate + ',' +
-                                         'need_mapmatch=' + that.data.trackProcess.need_mapmatch
+                        'process_option': 'need_denoise=' + that.data.trackProcess.need_denoise + ','+
+                                          'need_vacuate=' + that.data.trackProcess.need_vacuate + ',' +
+                                          'need_mapmatch=' + that.data.trackProcess.need_mapmatch + ',' +
+                                          'transport_mode=' + that.data.transport_mode[that.data.trackProcess.transport_mode - 1]
                     };
-                    Urls.jsonp(Urls.trackList, paramsd, function(datad) {
+                    Urls.jsonp(Urls.getDistance, paramsd, function(datad) {
                         if(datad.status === 0){
                             var trackDistance = (datad.distance / 1000).toFixed(1);
                             that.setTracklistDistance(trackDistance, item.entity_name);
@@ -500,7 +839,7 @@ var TrackStore = Reflux.createStore({
                                 that.trigger('tracklistloaded');
                                 that.data.tracklistloadedConunt = 0;
                             }
-                        } else if (datad.status === 3006) {
+                        } else if (datad.status === 3006 || datad.status === 1) {
 
                             var tempTimeArr = [];
                             var partTime = Math.floor((that.data.end_time - that.data.start_time) / 6);
@@ -518,18 +857,16 @@ var TrackStore = Reflux.createStore({
                             }];
                             tempTimeArr.map(function (item_time) {
                                 var param_time = {
-                                    'service_id': that.data.serviceId,
                                     'start_time': item_time.start_time,
                                     'end_time': item_time.end_time,
                                     'entity_name': item.entity_name,
-                                    'simple_return': 2,
                                     'is_processed': that.data.trackProcess.is_processed.toString(),
                                     'process_option': 'need_denoise=' + that.data.trackProcess.need_denoise + ',' +
                                                      'need_vacuate=' + that.data.trackProcess.need_vacuate + ',' +
                                                      'need_mapmatch=' + that.data.trackProcess.need_mapmatch + ',' +
-                                                     'transport_mode=' + that.data.trackProcess.transport_mode
+                                                     'transport_mode=' + that.data.transport_mode[that.data.trackProcess.transport_mode - 1]
                                 };
-                                Urls.jsonp(Urls.trackList, param_time, function(data_time) {
+                                Urls.jsonp(Urls.getDistance, param_time, function(data_time) {
                                     if (data_time.status === 0) {
                                         if (!distance_time[key]) {
                                             distance_time[key] = {};
@@ -574,14 +911,32 @@ var TrackStore = Reflux.createStore({
      *
      * @param {array} data entity数据
      */
-    setTracklist: function(data) {
+    setTracklist: function (data) {
         var that = this;
         that.data.trackList = [];
-        data.entities.map(function(item) {
+        data.entities.map(function (item, index) {
             if (item.trackDistance != undefined){
+                // alert(1);
                 that.data.trackList.push([item.entity_name, item.trackDistance, item.trackDistance > 0 ? 0 : 1]);
             } else {
-                that.data.trackList.push({name: item.entity_name, distance: -1, style: 1});
+                that.data.trackList[index] = {
+                    name: item.entity_name,
+                    distance: -1,
+                    style: 1,
+                    desc: item.entity_desc ? item.entity_desc : '无'
+                };
+
+                // 从localstorage中获取应该显示到列表中的字段，entitydesc或者entityname
+                let entityOption = localStorage['entityOption' + that.data.serviceId];
+                if (entityOption === 'byname' || entityOption === undefined) {
+                    that.data.trackList[index]['print'] = item.entity_name;
+                } else if (entityOption === 'bydesc') {
+                    that.data.trackList[index]['print'] = item.entity_desc ? item.entity_desc : '无';
+                }
+
+                if (that.data.managerDemo) {
+                    that.data.trackList[index].entity_id = item.entity_id;
+                }
             }
         });
     },
@@ -655,6 +1010,7 @@ var TrackStore = Reflux.createStore({
         if (that.data.trackSearching === 1) {
             return;
         }
+        let first = (data !== undefined);
         that.data.trackSearching = 1;
         var tempTimeArr = [];
         that.data.selectTrack = data || that.data.selectTrack;
@@ -678,7 +1034,8 @@ var TrackStore = Reflux.createStore({
            'is_processed': that.data.trackProcess.is_processed.toString(),
            'process_option': 'need_denoise=' + that.data.trackProcess.need_denoise + ',' +
                              'need_vacuate=' + that.data.trackProcess.need_vacuate + ',' +
-                             'need_mapmatch=' + that.data.trackProcess.need_mapmatch
+                             'need_mapmatch=' + that.data.trackProcess.need_mapmatch + ',' +
+                             'transport_mode=' + that.data.transport_mode[that.data.trackProcess.transport_mode - 1]
         };
         var count = 1;
         var reTrackRoute = function (paramsr, page_index) {
@@ -692,15 +1049,15 @@ var TrackStore = Reflux.createStore({
                 'start_time': paramsr.start_time,
                 'end_time': paramsr.end_time,
                 'is_processed': paramsr.is_processed,
-                'process_option': paramsr.process_option,
-                'sort_type': 1
+                'process_option': paramsr.process_option
             };
 
             var search = function (paramsearch, counta, countb) {
-                Urls.jsonp(Urls.trackList, paramsearch, function(data) {
+                Urls.jsonp(Urls.getTrack, paramsearch, function(data) {
+                    that.data.trackRouteDataCount = that.data.trackRouteDataCount + 1;
                     if(data.status === 0){ 
                         that.data.trackRouteSortData.push({index: counta, data: data});
-                        if(++that.data.trackRouteDataCount === 12) {
+                        if(that.data.trackRouteDataCount === 12) {
                             that.data.trackRouteDataCount = 0;
                             that.data.trackRouteSortData.sort(function(a,b){return a.index - b.index});
 
@@ -708,13 +1065,18 @@ var TrackStore = Reflux.createStore({
                                 that.data.trackRoutePointData = that.data.trackRoutePointData.concat(that.data.trackRouteSortData[i].data.points);
                             }
                             that.data.trackRoutePointData.map(function(item){
-                                if(item.location[0] > 1 && item.location[1] > 1) {
+                                if (item.longitude > 1 && item.latitude > 1) {
                                     that.data.trackRouteNoZero.push(item);
                                 }  
-                            })
+                            });
+                            that.trigger('trackroutefirst', first);
                             that.trigger('trackroute', that.data.trackRouteNoZero);
                             that.data.trackSearching = 0;
                         }
+                    }
+                    if (that.data.trackRouteDataCount === 12) {
+                        that.data.trackRouteDataCount = 0;
+                        that.data.trackSearching = 0;
                     }
                 });
             };
@@ -783,7 +1145,11 @@ var TrackStore = Reflux.createStore({
                 'service_id': paramsr.service_id,
                 'entity_name': paramsr.entity_name,
                 'start_time': paramsr.start_time,
-                'end_time': paramsr.end_time
+                'end_time': paramsr.end_time,
+                'process_option': 'need_denoise=' + that.data.trackProcess.need_denoise + ','
+                                  + 'need_vacuate=' + that.data.trackProcess.need_vacuate + ','
+                                  + 'need_mapmatch=' + that.data.trackProcess.need_mapmatch + ','
+                                  + 'transport_mode=' + that.data.transport_mode[that.data.trackProcess.transport_mode - 1]
             };
             var search = function (paramsearch, counta) {
                 Urls.jsonp(Urls.getstaypoint, paramsearch, function(data) {
@@ -853,7 +1219,11 @@ var TrackStore = Reflux.createStore({
                 'service_id': paramsr.service_id,
                 'entity_name': paramsr.entity_name,
                 'start_time': paramsr.start_time,
-                'end_time': paramsr.end_time
+                'end_time': paramsr.end_time,
+                'process_option': 'need_denoise=' + that.data.trackProcess.need_denoise + ','
+                                  + 'need_vacuate=' + that.data.trackProcess.need_vacuate + ','
+                                  + 'need_mapmatch=' + that.data.trackProcess.need_mapmatch + ','
+                                  + 'transport_mode=' + that.data.transport_mode[that.data.trackProcess.transport_mode - 1]
             };
             var search = function (paramsearch, counta) {
                 Urls.jsonp(Urls.getBehaviorAnalysis, paramsearch, function(data) {
@@ -901,6 +1271,7 @@ var TrackStore = Reflux.createStore({
         this.data.trackProcess.need_denoise = data.need_denoise;
         this.data.trackProcess.need_vacuate = data.need_vacuate;
         this.data.trackProcess.need_mapmatch = data.need_mapmatch;
+        this.data.trackProcess.transport_mode = data.transport_mode;
     },
     /**
      * 响应Action hidetrackcanvas 隐藏显示路径的canvas层
@@ -915,6 +1286,76 @@ var TrackStore = Reflux.createStore({
      */
     onShowtrackcanvas: function(data) {
         this.trigger('showtrackcanvas');
+    },
+
+    /**
+     * 响应Action changeTimeline 设置轨迹显示的时间段
+     *
+     * @param {number} starttime 开始时间
+     * @param {number} endtime 结束时间
+     */
+    onChangeTimeline(starttime, endtime) {
+        this.trigger('changeTimeline', {
+            starttime: starttime,
+            endtime: endtime
+        });
+    },
+
+    /**
+     * 响应Action getaddress 进行地址解析
+     *
+     * @param {Object} point 点对象
+     */
+    onGetaddress(point) {
+        let that = this;
+        let param = {
+            location: point.lat + ',' + point.lng,
+            output: 'json'
+        };
+        Urls.jsonp(Urls.getAddress, param, function (data) {
+            let infoBoxObject = that.getTrackPointInfo(data, point);
+            that.trigger('getaddress', infoBoxObject);
+        });
+    },
+
+    /**
+     * store 内部，整合轨迹点信息窗口的数据格式
+     *
+     * @param {Object} data 逆地址解析返回的结果
+     * @param {Object} point 轨迹点对象数据
+     *
+     * @return {Object} 轨迹点信息窗口所需数据
+     */
+    getTrackPointInfo(data, point) {
+        let address = '';
+        if (data.status === 0) {
+            if (data.result.formatted_address !== '') {
+                address = data.result.formatted_address;
+            } else {
+                address = data.result.addressComponent.city + ', ' + data.result.addressComponent.country;
+            }
+        } else {
+            address = '地址未解析成功';
+        }
+        let infoBoxObject = {
+            point: point,
+            print: point.print,
+            infor: [
+                ['定位:', point.lnglat],
+                ['地址:', address],
+                ['速度:', point.printSpeed],
+                ['时间:', point.printTime],
+                ['高度:', point.height + '米'],
+                ['精度:', point.radius + '米']
+            ]
+            // lnglat: point.lnglat,
+            // address: address,
+            // printTime: point.printTime,
+            // printSpeed: point.printSpeed,
+            // height: point.height,
+            // radius: point.radius
+        };
+        return infoBoxObject;
     }
 });
 

@@ -13,11 +13,13 @@ var Search = React.createClass({
         return {
             value: '',
             visible:0,
-            cliking: 0
+            cliking: 0,
+            placeholder: ''
         };
     },
     componentDidMount: function () {
         var self = this;
+        this.state.placeholder = '请输入关键字';
         EntityStore.listen(self.onStatusChange);
     }, 
     onStatusChange: function (type,data) {
@@ -96,9 +98,10 @@ var Search = React.createClass({
     render: function () {
         var searchicon = __uri('/static/images/searchicon_2x.png');
         var clearsearch = __uri('/static/images/clearsearch_2x.png');
+        var placeholder = this.state.placeholder;
         return (
             <div className="searchEntity">
-                <input className="searchInput" placeholder="请输入名称"   value={this.state.value} onChange={this.handleChange} onKeyPress={this.handleKeyBoard}/>
+                <input className="searchInput" placeholder={placeholder}   value={this.state.value} onChange={this.handleChange} onKeyPress={this.handleKeyBoard}/>
                 <img src={searchicon} className="searchBtn" onClick={this.handleClickSearch}  />
                 <div className="line"></div>
                 <img src={clearsearch} className={this.state.visible === 0 ? 'clearSearchBtn hideCommon':'clearSearchBtn'}  onClick={this.handleClearClick}/>     

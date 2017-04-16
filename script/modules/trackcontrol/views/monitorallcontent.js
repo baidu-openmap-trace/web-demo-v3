@@ -1,3 +1,11 @@
+/* globals map */
+/* globals BMap */
+/* globals Reflux */
+/* globals mapv */
+/* globals dataSet */
+/* globals mapControl */
+/* eslint-disable fecs-camelcase */
+/* eslint-disable max-len */
 /**
  * @file 实时监控全部 Reflux View
  * @author 崔健 cuijian03@baidu.com 2016.08.23
@@ -61,6 +69,9 @@ var Monitorallcontent = React.createClass({
             case 'servicetype':
                 this.listenServicetype(data);
             break;
+            case 'boundsearchentity':
+                this.listenBoundsearchentity(data);
+                break;
         }
     },
     /**
@@ -136,16 +147,61 @@ var Monitorallcontent = React.createClass({
      * @param {data} 选中entity数据
      */
     listenSelectCarData: function(data) {
-        var marker = this.setMarker(data);
-        var infoWindow = this.setInfowindow(data,marker);
+        mapControl.removeMonitorInfoBox();
+        mapControl.removeEntityMarker();
+
+        mapControl.setEntityMarker(data, this.state.service_type);
+        mapControl.setMonitorInfoBox(data);
+
     },
+
+    /**
+     * 响应Store boundsearchentity事件,显示范围内车辆
+     *
+     * @param {Array} data 范围内entity数据
+     */
+    listenBoundsearchentity(data) {
+        let that = this;
+        let markerArr = [];
+        let MarkerOption = {};
+        if (that.state.service_type === 1) {
+            // MarkerOption.height = 41;
+            // MarkerOption.width = 34;
+        } else {
+            MarkerOption.height = 27;
+            MarkerOption.width = 22;
+        }
+        if (data.length === 0) {
+            mapControl.setBoundSearch([], MarkerOption);
+        } else {
+            data.map(function (item, index) {
+                let img = mapControl.getEntityIcon(that.state.service_type, item);
+                img.onload = function () {
+                    markerArr.push({
+                        geometry: {
+                            type: 'Point',
+                            coordinates: [item.point[0], item.point[1]]
+                        },
+                        icon: img,
+                        deg: item.direction ? item.direction : 0,
+                        entity_name: item.entity_name,
+                        entity_status: item.entity_status
+                    });
+                    if (markerArr.length === data.length) {
+                        mapControl.setBoundSearch(markerArr, MarkerOption);
+                    }
+                };
+            });
+        }
+    },
+
     /**
      * 响应Store selectcardata事件,显示被选车辆
      *
      */
-    listenHideSelectCar: function(){
-        map.clearOverlays();
-
+    listenHideSelectCar() {
+        mapControl.removeMonitorInfoBox();
+        mapControl.removeEntityMarker();
     },
     /**
      * 响应Store servicetype事件,显示被选车辆
@@ -154,119 +210,9 @@ var Monitorallcontent = React.createClass({
      */
     listenServicetype: function(data) {
         this.setState({service_type: data});
+        // console.log('type:' + data);
     },
-    /**
-     * view内部，设置marker
-     *
-     * @param {data} 选中entity数据
-     * @return {object} 新建的marker对象
-     */
-    setMarker: function(data) {
-        var point = new BMap.Point(data.point[0], data.point[1]);
-        var iconUrl = '';
 
-        var size;
-        var imageSize;
-        if (this.state.service_type === 1) {
-            size = new BMap.Size(41, 34);
-            imageSize = new BMap.Size(41, 34);
-            switch (data.infor[0][1].substring(0,2)) {
-                case '离线':
-                    iconUrl = __uri('/static/images/caroffnorth.png');
-                break;
-                case '静止':
-                    iconUrl = __uri('/static/images/carstaticnorth.png');
-                break;
-                default:
-                    iconUrl = __uri('/static/images/carrunnorth.png'); 
-            }
-        } else {
-            size = new BMap.Size(22, 27);
-            imageSize = new BMap.Size(22, 27);
-            switch (data.infor[0][1].substring(0,2)) {
-                case '离线':
-                    iconUrl = __uri('/static/images/othertypeoffline.png');
-                break;
-                case '静止':
-                    iconUrl = __uri('/static/images/othertypestatic.png');
-                break;
-                default:
-                    iconUrl = __uri('/static/images/othertype.png'); 
-            }
-        }
-        var icon = new BMap.Icon(iconUrl, size);
-        icon.setImageSize(imageSize);
-        var marker = new BMap.Marker(point,{icon:icon});
-        marker.setRotation(data.direction);
-        map.clearOverlays();
-        map.addOverlay(marker);
-        map.panTo(point);
-        return marker;
-    },
-    /**
-     * view内部，设置infowindow
-     *
-     * @param {data} 选中entity数据
-     * @param {object} 当前marker
-     * @return {object} 新建的infowindow对象
-     */
-    setInfowindow: function(data,marker){
-        var infoContentFrontArr = [
-            '<div class="carInfoWindow">',
-                '<div class="carInfoHeader' + data.entity_status + '">',
-                    '<abbr title="' + data.entity_name +'">',
-                    data.entity_name,
-                    '</abbr>',
-                '</div>',
-                '<div class="carInfoContent">',
-        ];
-        data.infor.map(function(item) {
-            var itemPushArr = [
-                '<div class="carInfoItem">',
-                    '<div class="infoItemTitle">',
-                        item[0],
-                    '</div>',
-                    '<div class="infoItemContent">',
-                        item[1],
-                    '</div>',
-                '</div>',
-            ];
-            infoContentFrontArr.push(itemPushArr.join(''));
-        });
-        var infoContentNextArr = [
-            '</div>',
-            '<div class="infoControl">',
-                '<div class="infoZoomIn" id="infoZoomIn">',
-                    '放大',
-                '</div>',
-            '</div>',
-            '</div>'
-        ];
-        var infoBox = new BMapLib.InfoBox(
-            map,
-            infoContentFrontArr.concat(infoContentNextArr).join(''),
-            {
-                boxClass:'carInfoBox',
-                // boxStyle:{background:"url('tipbox.gif') no-repeatcenter top",width: "200px"},
-                closeIconMargin: "15px 20px 0 0",
-                alignBottom: false,
-                closeIconUrl: __uri('/static/images/closeinfowindow.png')
-            }
-        );
-        infoBox.open(marker);
-        marker.addEventListener("click", function(){          
-           infoBox.open(marker);
-        });
-        this.setState({currentPoint: marker.getPosition()});
-        $('#infoZoomIn').click(function(e) {
-            infoBox.hide();
-            map.zoomIn();
-            map.panTo(marker.getPosition());
-            map.addEventListener('moveend', function(){
-                infoBox.show();
-            });
-        });
-    },
     /**
      * DOM操作回调，点击选中一辆车
      *
@@ -282,10 +228,9 @@ var Monitorallcontent = React.createClass({
         }
         var entity_name = realTarget.getAttribute('data-entity_name');
         var entity_status = realTarget.getAttribute('data-entity_status');
-        // $('.monitorListItem0, .monitorListItem1, .monitorListItem2').removeClass('monitorSelect');
-        // $(realTarget).addClass('monitorSelect');
+        var entity_id = realTarget.getAttribute('data-entity_id');
         this.setState({currentEntityName: entity_name});
-        TrackAction.selectcar(entity_name, entity_status, 'allCompleteEntities');
+        TrackAction.selectcar(entity_name, entity_status, entity_id, 'allCompleteEntities');
     },
     render: function() {
         var monitorTabIndex = this.state.monitorTabIndex;
@@ -299,8 +244,8 @@ var Monitorallcontent = React.createClass({
                     {
                         allEntity.map(function(item, key) {
                             return (
-                                <div className={'monitorListItem' + item[2] + ((currentEntityName === item[0]) ? ' monitorSelect' : '')} key={key} data-entity_name={item[0]} data-entity_status={item[2]} onClick={handleSelectCar}>
-                                    <div className="monitorListItemName" ><abbr title={item[0]}>{item[0]}</abbr></div>
+                                <div className={'monitorListItem' + item[2] + ((currentEntityName === item[0]) ? ' monitorSelect' : '')} key={key} data-entity_name={item[0]} data-entity_desc={item[4]} data-entity_status={item[2]} data-entity_id={item[3]} onClick={handleSelectCar}>
+                                    <div className="monitorListItemName" ><abbr title={item[5]}>{item[5]}</abbr></div>
                                     <div className="monitorListItemSpeed">{item[1]}</div>
                                 </div>
                                 )

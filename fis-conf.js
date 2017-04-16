@@ -2,7 +2,7 @@ fis.match('/{script,components}/**.{js,jsx}', {
   isMod: true
 });
 
-fis.match('script/modules/common/views/content.js', {
+fis.match('script/modules/common/views/manager_content.js', {
   isMod: false
 });
 

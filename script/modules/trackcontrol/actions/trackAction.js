@@ -46,7 +46,17 @@ var TrackAction = Reflux.createActions([
     // 隐藏canvas
     'hidetrackcanvas',
     // 显示canvas
-    'showtrackcanvas'
+    'showtrackcanvas',
+    // 调整轨迹显示的时间段
+    'changeTimeline',
+    // 根据矩形区域检索entity
+    'boundsearchentity',
+    // 进行逆地址解析
+    'getaddress',
+    // 切换是否进行boundsearch检索
+    'switchboundsearch',
+    // 关闭infobox
+    'closemonitorinfobox'
 ]);
 
 export default TrackAction

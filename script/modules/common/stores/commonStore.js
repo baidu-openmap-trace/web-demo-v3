@@ -19,43 +19,6 @@ var CommonStore = Reflux.createStore({
      */
     onSwitchtab: function(index) {
         this.trigger('switchtab', index);
-    },
-    /**
-     * 响应Action access，检查登录状态
-     *
-     */
-    onAccess: function() {
-        var that = this;
-        Urls.get(Urls.statusCheck, {}, function(data){
-            if (data.isOnline === 1) {
-                Urls.jsonp(Urls.access, {}, function(data){
-                    that.trigger('access', data);
-                });
-            } else {
-                that.onLogin();
-            }
-        });
-    },
-    /**
-     * 响应Action login，跳转到登陆页
-     *
-     */
-    onLogin: function() {
-        location.href =  Urls.login + '&u=' + location.href;
-    },
-    /**
-     * 响应Action logout，登出账号
-     *
-     */
-    onLogout: function() {
-        location.href =  Urls.logout + '&u=' + location.href;
-    },
-    /**
-     * 响应Action setting，跳转到账号设置页
-     *
-     */
-    onSetting: function() {
-        location.href =  Urls.setting;
     }
 });
 

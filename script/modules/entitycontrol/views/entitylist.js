@@ -1,3 +1,6 @@
+/* globals Reflux */
+/* eslint-disable fecs-camelcase */
+/* eslint-disable max-len */
 /**
  * @file entity列表 Reflux View
  * @author 崔健 cuijian03@baidu.com 2016.08.20
@@ -27,7 +30,7 @@ var Entitylist = React.createClass({
             // 当前页码
             currentPage: 0,
             // 列表项的样式class索引
-            tableClass: ['entity_name', 'create_time', 'location', 'loc_time'],
+            tableClass: ['entity_name', 'other edit', 'create_time', 'location', 'loc_time'],
             // 列表初始高度，之后会根据当前页数据数量动态变化
             tableHeight: 0,
             // 当前页选中的entity
@@ -87,25 +90,23 @@ var Entitylist = React.createClass({
      * @param {array} 表内数据
      */
     listenList: function(data) {
-
+        // this.setState({entityList:data});
+        
         this.setTableHeight();
         var tempArray = new Array(15 - data.length);
         tempArray.fill(1);
-        var tempColumnArray = [];
         var tempEditValueArray = [];
         data.map(function(item1, index1) {
-            tempColumnArray[index1] = [];
             tempEditValueArray[index1] = [];
-            data[0].map(function(item2, index2) {
-                tempColumnArray[index1][index2] = 0;
-                tempEditValueArray[index1][index2] = 0;
-            });
         });
+
+        // this.setState({edit: tempColumnArray});
+
+        // this.setState({editValue: tempEditValueArray});
 
         this.setState({
             entityList: data,
             blankEntityList: tempArray,
-            edit: tempColumnArray,
             editValue: tempEditValueArray
         });
     },
@@ -174,7 +175,11 @@ var Entitylist = React.createClass({
         $('.entityList .thead').css('border-left', '1px solid #2096ff');
         var length = tempClass.length;
         for (var i = length; i < data.length; i++) {
-            if (i >= length) {
+            if (i === length) {
+                tempClass[i] = 'other';
+            }
+            
+            if (i > length) {
                 tempClass[i] = 'other edit';
             }
         }
@@ -210,11 +215,9 @@ var Entitylist = React.createClass({
      * @param {object} event 事件对象
      */
     handleEditEntity: function(event) {
-        var tempArray = this.state.edit;
-        tempArray[parseInt(event.target.getAttribute('data-column'))][parseInt(event.target.getAttribute('data-row'))] = 1;
-        var tempValueArray = this.state.editValue;
+        let tempValueArray = this.state.editValue;
         tempValueArray[parseInt(event.target.getAttribute('data-column'))][parseInt(event.target.getAttribute('data-row'))] = event.target.value;
-        this.setState({edit: tempArray, editValue: tempValueArray})
+        this.setState({editValue: tempValueArray});
     },
     /**
      * DOM操作回调，保存自定义字段
@@ -222,11 +225,25 @@ var Entitylist = React.createClass({
      * @param {object} event 事件对象
      */
     handleSaveEditEntity: function(event) {
-        // console.log(event.target.value);
-        var tempObject = {};
-        tempObject[event.target.getAttribute('data-key')] = event.target.value;
-        tempObject.entity_name = event.target.getAttribute('data-entity_name');
-        EntityAction.update(tempObject);
+        let data_column = event.target.getAttribute('data-column');
+        let data_row = event.target.getAttribute('data-row');
+        if (!!this.state.editValue[data_column][data_row]) {
+            let tempObject = {};
+            tempObject[event.target.getAttribute('data-key')] = event.target.value;
+            tempObject.entity_name = event.target.getAttribute('data-entity_name');
+            EntityAction.update(tempObject);
+            let temp = this.state.entityList;
+            temp[data_column][data_row][1] = this.state.editValue[data_column][data_row];
+            this.setState({entityList: temp});
+        }
+
+        if (this.state.editValue[data_column][data_row]  === '') {
+            let temp = this.state.editValue;
+            temp[data_column][data_row] = undefined;
+            this.setState({
+                editValue: temp
+            });
+        }
     },
     /**
      * DOM操作回调，处理鼠标浮动到tr上
@@ -240,8 +257,8 @@ var Entitylist = React.createClass({
         } while(node.className != 'entitylistTr')
         $(node.childNodes).css('background-color', '#f4f4f4');
         var entity_name = node.childNodes[0].getAttribute('data-keyname');
-        $("input[data-entity_name="+entity_name + "]").css('background-color', '#f4f4f4');
-        $("input[data-entity_name="+entity_name + "]").css('border-color', '#f4f4f4');
+        // $("input[data-entity_name="+entity_name + "]").css('background-color', '#f4f4f4');
+        // $("input[data-entity_name="+entity_name + "]").css('border-color', '#f4f4f4');
     },
     /**
      * DOM操作回调，处理鼠标移开tr上
@@ -255,8 +272,8 @@ var Entitylist = React.createClass({
         } while(node.className != 'entitylistTr')
         $(node.childNodes).css('background-color', '');
         var entity_name = node.childNodes[0].getAttribute('data-keyname');
-        $("input[data-entity_name="+entity_name + "]").css('background-color', '');
-        $("input[data-entity_name="+entity_name + "]").css('border-color', '');
+        // $("input[data-entity_name="+entity_name + "]").css('background-color', '');
+        // $("input[data-entity_name="+entity_name + "]").css('border-color', '');
     },
     render: function() {
         var column = this.state.column;
@@ -280,7 +297,7 @@ var Entitylist = React.createClass({
                             <tr><td className="thead tableCheck"></td>
                                 {
                                     column.map(function(item, index) {
-                                        return <td key={index} className={tableClass[index] + ' thead'}>{item}</td>
+                                        return <td key={index} className={tableClass[index] + ' thead'}><addr title={item}>{item}</addr></td>
                                     })
                                 }
                             </tr>
@@ -291,7 +308,9 @@ var Entitylist = React.createClass({
                                                 return (
                                                     <td key={j} className={tableClass[j]}>
                                                         {
-                                                            tableClass[j] === 'other edit' ? <input type="text" className="editEntity" data-entity_name={item[0][1]} data-key={i[0]} data-column={index} data-row={j} value={(!edit.length || edit[index][j]) === 0 ? i[1] : (!!editValue.length ? editValue[index][j] : 0)} onChange={handleEditEntity} onBlur={handleSaveEditEntity}/> : <abbr title={i[1]}>{i[1]}</abbr>
+                                                            tableClass[j] === 'other edit'
+                                                            ? <input type="text" className="editEntity" data-entity_name={item[0][1]} data-key={i[0]} data-column={index} data-row={j} value={editValue[index][j] !== undefined ? editValue[index][j] : i[1]} onChange={handleEditEntity} onBlur={handleSaveEditEntity}/>
+                                                            : <abbr title={i[1]}>{i[1]}</abbr>
                                                         }
                                                     </td>
                                                 )

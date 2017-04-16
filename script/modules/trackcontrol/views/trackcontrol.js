@@ -9,6 +9,7 @@ import Manage from 'manage'
 import Map from 'map'
 import Timeline from 'timeline'
 import Trackanalysis from 'trackanalysis'
+import Boundcontrol from 'boundcontrol';
 
 var Trackcontrol = React.createClass({
     getInitialState: function() {
@@ -43,6 +44,7 @@ var Trackcontrol = React.createClass({
             <Manage />
             <Timeline />
             <Trackanalysis />
+            <Boundcontrol />
         </div>
         )
     }

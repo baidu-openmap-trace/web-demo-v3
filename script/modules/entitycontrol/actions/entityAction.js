@@ -8,8 +8,6 @@ var EntityAction = Reflux.createActions([
     'list',
     // 列出所有列名，包括固定列和自定义列
     'listcolumn',
-    // 添加新entity
-    'add',
     // 检索entity
     'search',
     // 移除entity

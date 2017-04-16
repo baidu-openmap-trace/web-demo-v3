@@ -4,6 +4,13 @@
  */
 import Commonfun from 'commonfun'
 var urls = {
+    // 矩形区域检索entity
+    boundsearchEntity: '//yingyan.baidu.com/api/v3/entity/boundsearch',
+    // 获取track的distance
+    getDistance: '//yingyan.baidu.com/api/v3/track/getdistance',
+    // 获取track信息
+    getTrack: '//yingyan.baidu.com/api/v3/track/gettrack',
+
     // 获取自定义字段列表
     columnsList: '//yingyan.baidu.com/api/v3/entity/listcolumn',
     // 经纬度解析

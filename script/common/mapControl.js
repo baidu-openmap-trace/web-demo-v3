@@ -1,9 +1,16 @@
+/* globals BMap */
+/* globals map */
+/* globals BMapLib */
+/* globals mapv */
+/* globals dataSet */
+/* eslint-disable fecs-camelcase */
 /**
  * @file 初始化地图样式和组件
  * @author 崔健 cuijian03@baidu.com 2016.08.22
  */
 
 // import ZoomControl from 'zoomControl'
+import TrackAction from '../modules/trackcontrol/actions/trackAction';
 
 window.mapControl = {
     /**
@@ -11,115 +18,36 @@ window.mapControl = {
      *
      */
     initMap: function() {
-        var script = document.createElement('script');
-        script.src = 'http://api.map.baidu.com/library/InfoBox/1.2/src/InfoBox_min.js';
-        document.getElementsByTagName('head')[0].appendChild(script);
-        var script = document.createElement('script');
-        script.src = __uri('/static/javascript/CanvasLayer.js');
-        document.getElementsByTagName('head')[0].appendChild(script);
+        let that = this;
+        let infoBoxScript = document.createElement('script');
+        infoBoxScript.src = 'http://api.map.baidu.com/library/InfoBox/1.2/src/InfoBox_min.js';
+        document.getElementsByTagName('head')[0].appendChild(infoBoxScript);
+        let canvasScript = document.createElement('script');
+        canvasScript.src = __uri('/static/javascript/CanvasLayer.js');
+        document.getElementsByTagName('head')[0].appendChild(canvasScript);
+        let mapvScript = document.createElement('script');
+        mapvScript.src = 'http://mapv.baidu.com/build/mapv.js';
+        document.getElementsByTagName('head')[0].appendChild(mapvScript);
+        mapvScript.onload = function () {
+            that.initBoundsearch();
+        };
         window.map = new BMap.Map("mapContainer", {enableMapClick: false});    // 创建Map实例
-        map.centerAndZoom(new BMap.Point(116.404, 39.915), 14);  // 初始化地图,设置中心点坐标和地图级别
+        map.centerAndZoom(new BMap.Point(116.404, 39.915), 10);  // 初始化地图,设置中心点坐标和地图级别
         map.enableScrollWheelZoom(true);     //开启鼠标滚轮缩放
         this.initLocation();
         this.initControl();
         this.initOverlay();
     },
-    mapReady: 0,
-    dataReady: 0,
-    bigdata: '',
-    
-    /**
-     * 设置大数据
-     *
-     */
-    setBigData: function(data) {
-        this.bigdata = data;
-        this.dataReady = 1;
-        this.drawBigData();
-    },
-    /**
-     * 绘制大数据
-     *
-     */
-    drawBigData: function() {
-        if (this.mapReady + this.dataReady === 2){
-            // console.log('draw');
-            var data = [];
-            var timeData = [];
-            var bmapPoint = [];
-            var projection = new BMap.MercatorProjection();
 
-            this.bigdata = this.bigdata.split("\n");
-            for (var i = 0; i < this.bigdata.length; i++) {
-                var item = this.bigdata[i].split(',');
-                var coordinates = [];
-                for (var j = 0; j < item.length; j += 2) {
-                    coordinates.push([item[j], item[j + 1]]);
-                    var pixel = new BMap.Pixel(item[j], item[j + 1])
-                    var point = projection.pointToLngLat(pixel);
-                    bmapPoint.push(point);
-                    timeData.push({
-                        geometry: {
-                            type: 'Point',
-                            coordinates: [item[j], item[j + 1]]
-                        },
-                        count: 1,
-                        time: j
-                    });
-                }
-                data.push({
-                    geometry: {
-                        type: 'LineString',
-                        coordinates: coordinates
-                    },
-                    count: 30 * Math.random()
-                });
-                
-            }
-            if(bmapPoint.length > 1) {
-                datamap.setViewport(bmapPoint);
-            }
-            var dataSet = new mapv.DataSet(data);
-
-            var options = {
-                strokeStyle: 'rgba(53,57,255,0.5)',
-                coordType: 'bd09mc',
-                // globalCompositeOperation: 'lighter',
-                shadowColor: 'rgba(53,57,255,0.2)',
-                shadowBlur: 3,
-                lineWidth: 3.0,
-                draw: 'simple'
-            }
-
-            var mapvLayer = new mapv.baiduMapLayer(datamap, dataSet, options);
-
-
-            var dataSet = new mapv.DataSet(timeData);
-
-            var options = {
-                fillStyle: 'rgba(255, 250, 250, 0.2)',
-                coordType: 'bd09mc',
-                globalCompositeOperation: "lighter",
-                size: 1.5,
-                animation: {
-                    steps: 100,
-                    trails: 1,
-                    duration: 5,
-                },
-                draw: 'simple'
-            }
-
-            var mapvLayer = new mapv.baiduMapLayer(datamap, dataSet, options);
-        } else {
-            // console.log('nodraw');
-        }
-        var currentTime = Math.round(new Date().getTime() / 1000);
-        if (currentTime >= 1477238400 && currentTime <= 1478448000) {
-            var gobtn = $('#gobtn');
-            gobtn.show();
-            gobtn.addClass('animated wobble');
-            gobtn.css('animation-iteration-count', 3);
-        }
+    initBoundsearch() {
+        map.addEventListener('zoomend', function () {
+            TrackAction.boundsearchentity();
+        });
+        map.addEventListener('moveend', function () {
+            TrackAction.boundsearchentity();
+        });
+        map.addEventListener('movestart', function () {
+        });
     },
     /**
      * 根据浏览器定位确定地图位置
@@ -157,17 +85,18 @@ window.mapControl = {
      */
     initOverlay: function() {
         this.initBehaviorOverlay();
+        this.initTrackPointOverlay();
     },
     /**
      * 添加城市列表控件
      *
      */
     addCityListControl: function() {
-       var size = new BMap.Size(360, 72);
-       map.addControl(new BMap.CityListControl({
-           anchor: BMAP_ANCHOR_TOP_LEFT,
-           offset: size,
-       }));
+        var size = new BMap.Size(360, 72);
+        map.addControl(new BMap.CityListControl({
+            anchor: BMAP_ANCHOR_TOP_LEFT,
+            offset: size
+        }));
     },
     /**
     * 添加缩放控件
@@ -181,7 +110,7 @@ window.mapControl = {
         var ZoomControl = function (){
             // 默认停靠位置和偏移量
             this.defaultAnchor = BMAP_ANCHOR_BOTTOM_RIGHT;
-            this.defaultOffset = new BMap.Size(15, 70);
+            this.defaultOffset = new BMap.Size(15, 90);
         }
 
         // 通过JavaScript的prototype属性继承于BMap.Control
@@ -228,7 +157,7 @@ window.mapControl = {
         this.TrafficControl = function (){
             // 默认停靠位置和偏移量
             this.defaultAnchor = BMAP_ANCHOR_BOTTOM_RIGHT;
-            this.defaultOffset = new BMap.Size(15, 177);
+            this.defaultOffset = new BMap.Size(15, 197);
         }
 
         // 通过JavaScript的prototype属性继承于BMap.Control
@@ -268,7 +197,7 @@ window.mapControl = {
         var MapTypeControl = function (){
             // 默认停靠位置和偏移量
             this.defaultAnchor = BMAP_ANCHOR_BOTTOM_RIGHT;
-            this.defaultOffset = new BMap.Size(15, 139);
+            this.defaultOffset = new BMap.Size(15, 159);
         }
 
         // 通过JavaScript的prototype属性继承于BMap.Control
@@ -311,7 +240,7 @@ window.mapControl = {
         this.SpeedControl = function (){
             // 默认停靠位置和偏移量
             this.defaultAnchor = BMAP_ANCHOR_BOTTOM_RIGHT;
-            this.defaultOffset = new BMap.Size(15, 215);
+            this.defaultOffset = new BMap.Size(15, 235);
         }
 
         // 通过JavaScript的prototype属性继承于BMap.Control
@@ -448,6 +377,7 @@ window.mapControl = {
             this._map = map;
             var div = this._div = document.createElement("div");
             div.className = 'behaviorOverlay ' + this._type;
+
             var text = document.createTextNode(that._data);
             div.appendChild(text);
             
@@ -465,9 +395,9 @@ window.mapControl = {
                         div.style.width = '65px';
                     break
                 }
-                
-                
+
                 div.style.boxShadow = "0px 3px 3px #bcbcbb";
+
             }
 
             div.onmouseout = function(){
@@ -496,6 +426,354 @@ window.mapControl = {
          if (this._div){    
            this._div.style.display = "none";    
          }    
+        }
+    },
+
+    /**
+     * 初始化轨迹点信息覆盖物
+     *
+     */
+    initTrackPointOverlay() {
+        this.trackPointOverlay = function (point, type) {
+            this._point = point;
+            // this.type = 'trackpoint';
+            this.type = type;
+        };
+        this.trackPointOverlay.prototype = new BMap.Overlay();
+        this.trackPointOverlay.prototype.initialize = function (map) {
+            let that = this;
+            this._map = map;
+            let div = this._div = document.createElement('div');
+            // div.className = 'trackpointOverlay';
+            div.className = this.type;
+            let innerDiv = document.createElement('div');
+            innerDiv.className = 'trackpoint_in';
+            div.appendChild(innerDiv);
+            map.getPanes().labelPane.appendChild(div);
+            return div;
+        };
+        this.trackPointOverlay.prototype.draw = function () {
+            let map = this._map;
+            let pixel = map.pointToOverlayPixel(this._point);
+            this._div.style.left = pixel.x - 8 + 'px';
+            this._div.style.top  = pixel.y  - 8 + 'px';
+        };
+    },
+
+    /**
+     * 添加轨迹点信息覆盖物
+     *
+     * @param {Object} point 点
+     * @param {string} type 点类型
+     */
+    addTrackPointOverlay(point, type) {
+        let myCompOverlay = new this.trackPointOverlay(point, type);
+        map.addOverlay(myCompOverlay);
+    },
+
+    /**
+    * 删除轨迹点信息覆盖物
+    *
+    * @param {string} type 类型，分为鼠标浮动和点击两种
+    */
+    removeTrackPointOverlay(type) {
+        let overlays = map.getOverlays();
+        let length = overlays.length;
+        let trackPointOverlays = [];
+        for (let i = 0; i < length; i++) {
+            if (overlays[i].type === type) {
+                trackPointOverlays.push(overlays[i]);
+            }
+        }
+        for (let j = 0; j < trackPointOverlays.length; j++) {
+            map.removeOverlay(trackPointOverlays[j]);
+        }
+    },
+
+    /**
+     * 初始化车辆信息详情和轨迹点详情infobox
+     *
+     * @param {Object} data 数据
+     */
+    setMonitorInfoBox(data) {
+        let infoContentFrontArr = [
+            '<div class="carInfoWindow">',
+                '<div class="carInfoHeader' + data.entity_status + '">',
+                    '<abbr title="' + data.entity_print + '">',
+                    data.entity_print,
+                    '</abbr>',
+                '</div>',
+                '<div class="carInfoContent">'
+        ];
+        data.infor.map(function (item) {
+            let itemPushArr = [
+                '<div class="carInfoItem">',
+                    '<div class="infoItemTitle">',
+                        item[0],
+                    '</div>',
+                    '<div class="infoItemContent">',
+                        item[1],
+                    '</div>',
+                '</div>'
+            ];
+            infoContentFrontArr.push(itemPushArr.join(''));
+        });
+        let infoContentNextArr = [
+            '</div>',
+            '<div class="infoControl">',
+                '<div class="infoZoomIn" id="monitorInfoZoomIn">',
+                    '放大',
+                '</div>',
+            '</div>',
+            '</div>'
+        ];
+        this.monitorInfoBox = new BMapLib.InfoBox(
+            map,
+            infoContentFrontArr.concat(infoContentNextArr).join(''),
+            {
+                boxClass: 'carInfoBox',
+                // boxStyle:{background:"url('tipbox.gif') no-repeatcenter top",width: "200px"},
+                closeIconMargin: '15px 20px 0 0',
+                alignBottom: false,
+                closeIconUrl: __uri('/static/images/closeinfowindow.png')
+            }
+        );
+        this.monitorInfoBox.addEventListener('close', function (e) {
+            TrackAction.closemonitorinfobox();
+        });
+        this.monitorInfoBox.open(this.entityMarker);
+        $('#monitorInfoZoomIn').click(function (e) {
+            // this.monitorInfoBox.hide();
+            map.zoomIn();
+            map.addEventListener('moveend', function () {
+                // that.monitorInfoBox.show();
+            });
+        });
+    },
+
+    /**
+     * 删除infobox
+     *
+     */
+    removeMonitorInfoBox() {
+        map.removeOverlay(this.monitorInfoBox);
+        this.monitorInfoBox = null;
+    },
+
+    /**
+     * 设置设备监控的marker
+     *
+     * @param {Object} data marker的数据信息
+     * @param {number} service_type 服务类型
+     */
+    setEntityMarker(data, service_type) {
+        let that = this;
+        let point = new BMap.Point(data.point[0], data.point[1]);
+        let iconUrl = '';
+        let size;
+        let imageSize;
+        let status = data.status;
+        if (service_type === 1) {
+            size = new BMap.Size(41, 34);
+            imageSize = new BMap.Size(41, 34);
+            switch (status.substring(0, 2)) {
+                case '离线':
+                    iconUrl = __uri('/static/images/caroffnorth.png');
+                    break;
+                case '静止':
+                    iconUrl = __uri('/static/images/carstaticnorth.png');
+                    break;
+                default:
+                    iconUrl = __uri('/static/images/carrunnorth.png');
+                    break;
+            }
+        } else {
+            size = new BMap.Size(22, 27);
+            imageSize = new BMap.Size(22, 27);
+            switch (status.substring(0, 2)) {
+                case '离线':
+                    iconUrl = __uri('/static/images/othertypeoffline.png');
+                    break;
+                case '静止':
+                    iconUrl = __uri('/static/images/othertypestatic.png');
+                    break;
+                default:
+                    iconUrl = __uri('/static/images/othertype.png');
+                    break;
+            }
+        }
+        let icon = new BMap.Icon(iconUrl, size);
+        icon.setImageSize(imageSize);
+        this.entityMarker = new BMap.Marker(point, {icon: icon});
+        this.entityMarker.setRotation(data.direction);
+        this.entityMarker.addEventListener('click', function (e) {
+            that.monitorInfoBox.open(that.entityMarker);
+        });
+        map.addOverlay(this.entityMarker);
+        // 如果是定时器触发的，那么不移动地图
+        if (!data.interval) {
+            map.panTo(point);
+        }
+    },
+
+    /**
+     * 根据entity的类型和状态获取图标
+     *
+     * @param {number} type service类型
+     * @param {Object} data entity的数据
+     * @return {string} entity的icon地址
+     */
+    getEntityIcon(type, data) {
+        let img = new Image();
+        let iconUrl = '';
+        let height = 0;
+        let width = 0;
+        // console.log(data);
+        let status = data.status;
+        if (type === 1) {
+            height = 41;
+            width = 34;
+            switch (status) {
+                case '离线':
+                    iconUrl = __uri('/static/images/caroffnorth.png');
+                    break;
+                case '静止':
+                    iconUrl = __uri('/static/images/carstaticnorth.png');
+                    break;
+                default:
+                    iconUrl = __uri('/static/images/carrunnorth.png');
+                    break;
+            }
+        } else {
+            height = 22;
+            width = 27;
+            switch (status) {
+                case '离线':
+                    iconUrl = __uri('/static/images/othertypeoffline.png');
+                    break;
+                case '静止':
+                    iconUrl = __uri('/static/images/othertypestatic.png');
+                    break;
+                default:
+                    iconUrl = __uri('/static/images/othertype.png');
+                    break;
+            }
+        }
+        img.src = iconUrl;
+        img.style.width = width;
+        img.style.height = height;
+        return img;
+    },
+
+    /**
+     * 删除设备监控的marker,
+     *
+     */
+    removeEntityMarker() {
+        map.removeOverlay(this.entityMarker);
+        this.entityMarker = null;
+    },
+
+    /**
+     * 初始化车辆信息详情和轨迹点详情infobox
+     *
+     * @param {Object} data 数据
+     */
+    setTrackInfoBox(data) {
+        // console.log(data);
+        let infoContentFrontArr = [
+            '<div class="carInfoWindow">',
+                '<div class="carInfoHeader0">',
+                    '<abbr title="' + data.print + '">',
+                    data.print,
+                    '</abbr>',
+                '</div>',
+                '<div class="carInfoContent">'
+        ];
+        data.infor.map(function (item) {
+            let itemPushArr = [
+                '<div class="carInfoItem">',
+                    '<div class="infoItemTitle">',
+                        item[0],
+                    '</div>',
+                    '<div class="infoItemContent">',
+                        item[1],
+                    '</div>',
+                '</div>'
+            ];
+            infoContentFrontArr.push(itemPushArr.join(''));
+        });
+        let infoContentNextArr = [
+            '</div>',
+            '<div class="infoControl">',
+                '<div class="infoZoomIn" id="trackInfoZoomIn">',
+                    '放大',
+                '</div>',
+            '</div>',
+            '</div>'
+        ];
+        // return;
+
+        this.trackInfoBox = new BMapLib.InfoBox(
+            map,
+            infoContentFrontArr.concat(infoContentNextArr).join(''),
+            {
+                boxClass:'carInfoBox',
+                closeIconMargin: '15px 20px 0 0',
+                alignBottom: false,
+                closeIconUrl: __uri('/static/images/closeinfowindow.png')
+            }
+        );
+        this.trackInfoBox.open(data.point);
+        $('#trackInfoZoomIn').click(function (e) {
+            // this.trackInfoBox.hide();
+            map.zoomIn();
+            map.addEventListener('moveend', function () {
+                // that.trackInfoBox.show();
+            });
+        });
+        // this.trackInfoBox.addEventListener('close', this.removeTrackPointOverlay('trackpointonOverlay'));
+        map.panTo(data.point);
+    },
+
+    /**
+     * 删除infobox
+     *
+     */
+    removeTrackInfoBox() {
+        map.removeOverlay(this.trackInfoBox);
+        this.trackInfoBox = null;
+    },
+
+    /**
+     * 设置boundsearch展示
+     *
+     * @param {Array} markerArr 展示数据
+     * @param {Object} MarkerOption 数据样式
+     */
+    setBoundSearch(markerArr, MarkerOption) {
+        let overlays = map.getOverlays();
+        if (window.dataSet && window.mapvLayer && overlays.length !== 0) {
+
+            window.dataSet.set(markerArr);
+        } else {
+            window.dataSet = new mapv.DataSet(markerArr);
+            let options = {
+
+                methods: {
+                    click(item) {
+                        if (item === null) {
+                            return;
+                        }
+                        TrackAction.selectcar(item.entity_name, item.entity_status, '');
+                    }
+                },
+                size: 20,
+                draw: 'icon',
+                height: MarkerOption.height,
+                width: MarkerOption.width
+            };
+            window.mapvLayer = new mapv.baiduMapLayer(map, dataSet, options);
         }
     }
 }
