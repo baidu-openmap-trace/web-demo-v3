@@ -6,8 +6,8 @@
 /* eslint-disable fecs-camelcase */
 /* eslint-disable max-len */
 /**
- * @file ¹ì¼£²éÑ¯ÁÐ±í Reflux View
- * @author ´Þ½¡ cuijian03@baidu.com 2016.08.29
+ * @file 轨迹列表和绘制轨迹 Reflux View
+ * @author 崔健 cuijian03@baidu.com 2016.08.29
  */
 import React, {Component} from 'react';
 import {render} from 'react-dom';
@@ -20,14 +20,14 @@ import Commonfun from '../../../common/commonfun';
 var Trackcontent = React.createClass({
     getInitialState: function() {
         return {
-            // µ±Ç°ÁÐ±íÄÚÈÝ
+            // 轨迹列表
             trackList: [],
-            // µ±Ç°Ñ¡ÖÐ³µµÄ×ø±ê
+            // 当前选中轨迹
             currentTrack: {},
-            // ¿Õ°×ÁÐ±íÏî
+            // 空白entity列表，占位用
             blankEntityList: [],
-            // µ±Ç°Ñ¡ÖÐµÄentityname
-            currentEntityName: '',
+            // 当前选择的entity名
+            currentEntityName: ''
             // 当前选中的entity显示的内容
             currentEntityPrint: '',
             // 是否是第一次点击绘制
@@ -39,7 +39,6 @@ var Trackcontent = React.createClass({
     componentDidMount: function () {
         TrackStore.listen(this.onStatusChange);
         TrackAction.tracklist(1);
-        // this.listenTrackRoute();
     }, 
     onStatusChange: function (type,data) {
         switch (type){
@@ -62,9 +61,9 @@ var Trackcontent = React.createClass({
     },
 
     /**
-     * 响应store getaddress 获取轨迹点的逆地址解析结果后，显示infobox
+     * 响应Store tracklist事件，初始化历史轨迹列表
      *
-     * @param {Object} data infobox数据
+     * @param {Object} data 轨迹数据
      */
     listenGetaddress(data) {
         mapControl.setTrackInfoBox(data);
@@ -78,16 +77,14 @@ var Trackcontent = React.createClass({
     listenTrackRouteFirst(data) {
         this.state.first = data;
     },
+
     /**
-     * ÏìÓ¦Store tracklistÊÂ¼þ£¬ÉèÖÃ¹ì¼£ÁÐ±í
+     * 响应Store tracklist事件，初始化历史轨迹列表
      *
-     * @param {data} ±êÇ©Ò³±êÊ¶
+     * @param {Array} data 轨迹数据
      */
-    listenTrackList: function(data) {
-        // this.setState({trackList: data});
-        // this.setState({trackList: []}, function() {
-            this.setState({trackList: data});
-        // });
+    listenTrackList(data) {
+        this.setState({trackList: data});
         var tempArray = new Array(10 - data.length);
         tempArray.fill(1);
         this.setState({blankEntityList: tempArray});
@@ -97,7 +94,7 @@ var Trackcontent = React.createClass({
      *
      * @param {Array} data 轨迹数据
      */
-    listenTrackRoute: function(data) {
+    listenTrackRoute(data) {
         var that = this;
         that.setState({
             currentTrackData: data
@@ -122,9 +119,6 @@ var Trackcontent = React.createClass({
      * @param {number} endtime 时间区间终点 可选
      */
     drawTrack(data, starttime, endtime) {
-        // console.log(this.state.currentEntityName);
-        // console.log(this.state.currentEntityPrint);
-        // console.log(data);
         if (!data) {
             data = this.state.currentTrackData;
         }
@@ -303,7 +297,6 @@ var Trackcontent = React.createClass({
                     } else {
                         lines = lines + 1;
                         let lineNum = lines;
-                        // lineObj['l' + i] = lines;
                         nextArray.push([pixel, nextPixel]);
                         if (totalPoints[i + 1].loc_time >= starttime && totalPoints[i + 1].loc_time <= endtime) {
                             let partImgStart = new Image();
@@ -410,11 +403,11 @@ var Trackcontent = React.createClass({
         map.addOverlay(pointCollection);  // 添加Overlay
     },
     /**
-     * viewÄÚ²¿ ¸ù¾ÝËÙ¶È»ñÈ¡ÑÕÉ«
+     * view内部方法，根据速度获取对应的轨迹绘制颜色
      * 
-     * @param {number} speed ËÙ¶È
+     * @param {number} speed 速度
      *
-     * @return {string} ÑÕÉ«µÄÊ®Áù½øÖÆRGB
+     * @return {string} 颜色RGB字符串
      */
     getColorBySpeed: function(speed) {
         var color = '';
@@ -460,9 +453,9 @@ var Trackcontent = React.createClass({
         return color;
     },
     /**
-     * DOM²Ù×÷»Øµ÷£¬µã»÷Ñ¡ÖÐÒ»¸ö¹ì¼£
+     * DOM事件回掉，处理点击选中某条历史轨迹
      *
-     * @param {object} event ÊÂ¼þ¶ÔÏó 
+     * @param {object} event 事件对象
      */
     handleSelectTrack: function(event) {
         let realTarget = event.target;
@@ -475,14 +468,9 @@ var Trackcontent = React.createClass({
         let entity_name = realTarget.getAttribute('data-entity_name');
         let entity_id = realTarget.getAttribute('data-entity_id');
         let entity_print = realTarget.getAttribute('data-entity_print');
-        // $('.monitorListItem0, .monitorListItem1, .monitorListItem2').removeClass('monitorSelect');
-        // $(realTarget).addClass('monitorSelect');
         this.setState({currentEntityName: entity_name});
         this.setState({currentEntityPrint: entity_print});
-        // mapControl.removeBehaviorOverlay();
         TrackAction.selecttrack(entity_name, entity_id);
-        // TrackAction.behavioranalysis();
-        // TrackAction.getstaypoint();
     },
     render: function() {
         var trackList = this.state.trackList;
