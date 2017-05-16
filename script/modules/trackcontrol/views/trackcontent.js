@@ -27,7 +27,7 @@ var Trackcontent = React.createClass({
             // 空白entity列表，占位用
             blankEntityList: [],
             // 当前选择的entity名
-            currentEntityName: ''
+            currentEntityName: '',
             // 当前选中的entity显示的内容
             currentEntityPrint: '',
             // 是否是第一次点击绘制
