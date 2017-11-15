@@ -635,7 +635,6 @@ abbr{
 
 .switchPage span{
     display: block;
-    float: left;
     width: 27px;
     cursor: pointer;
     height: 21px;
@@ -651,10 +650,12 @@ abbr{
 }
 
 .lastPageOn{
+    float: right;
     background-image: url('/static/images/lastpageon.png');
 }
 
 .lastPageOff{
+    float: right;
     background-image: url('/static/images/lastpageoff.png');
 }
 
