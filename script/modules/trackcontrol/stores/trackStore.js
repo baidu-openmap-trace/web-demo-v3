@@ -569,7 +569,7 @@ var TrackStore = Reflux.createStore({
                             if (dataGeo.result.formatted_address !== '') {
                                 address = dataGeo.result.formatted_address;
                             } else {
-                                address = dataGeo.result.addressComponent.city + ', ' + location_desc.result.addressComponent.country;
+                                address = dataGeo.result.addressComponent.city + ', ' + dataGeo.result.addressComponent.country;
                             }
                             that.data.selectCompleteEntities[index] = {
                                 point: [item.latest_location.longitude, item.latest_location.latitude],
