@@ -24,21 +24,58 @@ var commonfun = {
         second = second < 10 ? '0' + second : second;
         return d.getFullYear() + '-' + month + '-' +  day + ' ' + hour + ':' + minute + ':' + second; 
     },
+
+    /**
+     * 获取传入时间当天的0点0分0秒时间
+     *
+     * @param {Object} time js Date对象
+     * @return {string} 时间 格式：2016-08-19 19:18:15
+     */
+    getStartTime(time) {
+        let date = new Date(time);
+        date.setHours(0);
+        date.setMinutes(0);
+        date.setSeconds(0);
+        date.setMilliseconds(0);
+        return date;
+    },
+
     /**
      * 获取当前日期
      *
      * @param {string} time UNIX时间戳 可选
+     * @param {string} type 获取日期格式
      * @return {string} 时间 格式：2016-08-19
      */
-    getCurrentDate: function (e) {
+    getCurrentDate(e, type) {
         e = e || new Date();
-        var d = e;
-        var month = d.getMonth() + 1;
-        var day =  d.getDate();
-        month = month < 10 ? '0' + month : month;
-        day = day < 10 ? '0' + day : day;
-        return d.getFullYear() + '-' + month + '-' +  day; 
+        let d = e;
+        let result = '';
+        if (!type) {
+            let month = d.getMonth() + 1;
+            let day =  d.getDate();
+            month = month < 10 ? '0' + month : month;
+            day = day < 10 ? '0' + day : day;
+            result =  d.getFullYear() + '-' + month + '-' +  day;
+        } else if (type = 'hh:00') {
+            let minute = e.getMinutes();
+            if (minute <= 30) {
+                e = new Date(e.valueOf() - 60 * 60 * 1000 * 2);
+            } else {
+                e = new Date(e.valueOf() - 60 * 60 * 1000);
+            }
+            let hour = e.getHours();
+            let month = d.getMonth() + 1;
+            let day =  d.getDate();
+            let year = e.getFullYear();
+            hour = hour < 10 ? '0' + hour : hour + '';
+            month = month < 10 ? '0' + month : month;
+            day = day < 10 ? '0' + day : day;
+            result = e.getFullYear() + '-' + month + '-' + day + ' ' + hour + ':00';
+        }
+        return result;
     },
+
     /**
      * 从数组中移除指定项
      *
@@ -85,7 +122,7 @@ var commonfun = {
         status = timeDiff >= 10 ? 1 : 0;
         return status;
      },
-     /**
+    /**
      * 判断当前设备是否为静止，规则是速度小于1km/h返回静止，
      * 否则返回速度
      *
@@ -94,13 +131,15 @@ var commonfun = {
      */
     getSpeed: function(speed) {
         var speedDesc
-        if (speed >= 1) {
+        if (speed >= 150) {
+            speedDesc = ' - - ';
+        } else if (speed >= 1 && speed < 150) {
             speedDesc = speed.toFixed(1) + 'km/h';
         } else {
             speedDesc = '静止';
         }
         return speedDesc;
-     },
+    },
     /**
      * 返回当前弹窗中的状态字段数组，
      * 分别为状态、速度、方向
@@ -116,16 +155,16 @@ var commonfun = {
         speed = speed || 0;
         if (this.getOnlineStatus(time) === 0) {
             if (this.getSpeed(speed) === '静止') {
-                statusArr[0] = '静止';
+                statusArr[0] = '静止（时速不大于1km/h）';
                 statusArr[1] = '';
                 statusArr[2] = '';
             } else {
-                statusArr[0] = '<span class="run">行驶</span>';
+                statusArr[0] = '<span class="run">行驶（时速不小于1km/h）</span>';
                 statusArr[1] = this.getSpeed(speed);
                 statusArr[2] = this.getDirection(direction);
             }
         } else {
-            statusArr[0] = '离线';
+            statusArr[0] = '离线（10分钟内无定位点）';
             statusArr[1] = '';
             statusArr[2] = '';
         }

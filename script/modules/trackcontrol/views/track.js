@@ -51,7 +51,7 @@ var Track = React.createClass({
             TrackAction.selectcar();
             mapControl.showTrafficControl();
             mapControl.removeSpeedControl();
-            var overlays = map.getOverlays();
+            // var overlays = map.getOverlays();
             map.clearOverlays();
         }
     },

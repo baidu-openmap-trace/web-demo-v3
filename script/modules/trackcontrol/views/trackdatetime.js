@@ -11,12 +11,40 @@ import Commonfun from '../../../common/commonfun'
 var Trackdatetime = React.createClass({
     getInitialState: function() {
         return {
-            defaultDatetime: ''
+            defaultDatetime: '',
+            triggersetdate: new Date()
         };
     },
     componentDidMount: function () {
         this.initTrackDatetime();
+        TrackStore.listen(this.onStatusChange);
     },
+
+    componentDidUpdate() {
+        $('#datetimepicker').datetimepicker('setDate', this.state.triggersetdate);
+        TrackAction.changedatetime(Commonfun.getCurrentDate(this.state.triggersetdate));
+        TrackAction.tracklist();
+    },
+
+    onStatusChange(type, data) {
+        switch (type) {
+            case 'triggersetdate':
+                this.listenTriggerSetDate(data);
+                break;
+        }
+    },
+
+    /**
+     * 响应Store triggersetdate事件，触发更改时间
+     *
+     * @param {Object} date 时间对象
+     */
+    listenTriggerSetDate(date) {
+        this.setState({
+            triggersetdate: date
+        });
+    },
+
     /**
      * view内部 初始化时间选择插件
      *
@@ -35,13 +63,13 @@ var Trackdatetime = React.createClass({
             pickerPosition: 'bottom-left'
         });
         $('#datetimepicker').on('changeDate', function(e) {
-            that.setState({defaultDatetime: Commonfun.getCurrentDate(e.date)});
-            TrackAction.changedatetime(Commonfun.getCurrentDate(e.date));
-            TrackAction.tracklist();
+            that.setState({
+                defaultDatetime: Commonfun.getCurrentDate(e.date),
+                triggersetdate: e.date
+            });
         });
         $('#datetimepicker').datetimepicker('setEndDate', Commonfun.getCurrentDate());
         that.setState({defaultDatetime: Commonfun.getCurrentDate()});
-        TrackAction.changedatetime(Commonfun.getCurrentDate());
     },
     /**
      * DOM操作回调，这里没有实际作用，主要为了防止react报错
