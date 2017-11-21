@@ -521,8 +521,8 @@ window.mapControl = {
         let infoContentNextArr = [
             '</div>',
             '<div class="infoControl">',
-                '<div class="infoZoomIn" id="monitorInfoZoomIn">',
-                    '放大',
+                '<div class="infoGoTrack" id="monitorInfoZoomIn">',
+                    '轨迹',
                 '</div>',
             '</div>',
             '</div>'
@@ -543,11 +543,10 @@ window.mapControl = {
         });
         this.monitorInfoBox.open(this.entityMarker);
         $('#monitorInfoZoomIn').click(function (e) {
-            // this.monitorInfoBox.hide();
-            map.zoomIn();
-            map.addEventListener('moveend', function () {
-                // that.monitorInfoBox.show();
-            });
+            TrackAction.triggerswitchmanagetab(1);
+            TrackAction.triggersearchentitytrack();
+            TrackAction.triggersetdate();
+            TrackAction.triggerselecttrack();
         });
     },
 
@@ -752,9 +751,7 @@ window.mapControl = {
      * @param {Object} MarkerOption 数据样式
      */
     setBoundSearch(markerArr, MarkerOption) {
-        let overlays = map.getOverlays();
-        if (window.dataSet && window.mapvLayer && overlays.length !== 0) {
-
+        if (this.whetherSetBoundSearchData()) {
             window.dataSet.set(markerArr);
         } else {
             window.dataSet = new mapv.DataSet(markerArr);
@@ -774,6 +771,26 @@ window.mapControl = {
                 width: MarkerOption.width
             };
             window.mapvLayer = new mapv.baiduMapLayer(map, dataSet, options);
+        }
+    },
+
+    /**
+     * 判断是否可以直接配置boundsearch的数据
+     *
+     * @return {boolean} 是否可以直接配置数据
+     */
+    whetherSetBoundSearchData() {
+        const overlays = map.getOverlays();
+        if (window.dataSet && window.mapvLayer && overlays.length !== 0) {
+            if (overlays.length === 2
+                && overlays[0].toString() === '[object Marker]'
+                && overlays[1] instanceof BMapLib.InfoBox) {
+                return false;
+            } else {
+                return true;
+            }
+        } else {
+            return false;
         }
     }
 }

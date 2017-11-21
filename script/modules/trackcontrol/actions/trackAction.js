@@ -56,7 +56,15 @@ var TrackAction = Reflux.createActions([
     // 切换是否进行boundsearch检索
     'switchboundsearch',
     // 关闭infobox
-    'closemonitorinfobox'
+    'closemonitorinfobox',
+    // 模拟点击触发点击轨迹查询
+    'triggerswitchmanagetab',
+    // 模拟检索某个entity
+    'triggersearchentitytrack',
+    // 模拟点击列表第一项
+    'triggerselecttrack',
+    // 模拟更改轨迹查询的时间
+    'triggersetdate'
 ]);
 
 export default TrackAction

@@ -23,9 +23,29 @@ var Tracksearch = React.createClass({
         switch (type){
             case 'tracklistloaded':
                 this.listenListcomplete(type);
-            break;
+                break;
+            case 'triggersearchentitytrack':
+                this.listenTriggerSearchEntityTrack(data);
+                break;
         }
     },
+
+
+    /**
+     * 响应Store triggersearchentitytrack事件，触发检索
+     *
+     * @param {Object} data 检索对象
+     */
+    listenTriggerSearchEntityTrack(data) {
+        const eve = {
+            target: {
+                value: data.entity_name
+            }
+        };
+        this.handleChange(eve);
+        this.handleClickSearch();
+    },
+
     listenListcomplete: function() {
         this.setState({cliking: 0});
     },

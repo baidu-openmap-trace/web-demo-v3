@@ -14,6 +14,38 @@ var Managetab = React.createClass({
             pointerTabIndex: 0
         }
     },
+
+
+    componentDidMount() {
+        TrackStore.listen(this.onStatusChange);
+    },
+
+    onStatusChange(type, data) {
+        switch (type) {
+            case 'triggerswitchmanagetab':
+                this.listenTriggerSwitchManageTab(data);
+                break;
+        }
+    },
+
+    /**
+     * 响应Store triggerswitchmanagetab事件，触发tab切换
+     *
+     * @param {number} index 序号
+     */
+    listenTriggerSwitchManageTab(index) {
+        const event = (function () {
+            const tabClassName = ['monitorTab', 'trackTab'];
+            const eve = {
+                target: {
+                    className: tabClassName[index]
+                }
+            };
+            return eve;
+        }(index));
+        this.handleToggle(event);
+    },
+
     /**
      * DOM操作回调，切换标签页
      *

@@ -582,7 +582,7 @@ var TrackStore = Reflux.createStore({
                                     ['时间:', Commonfun.getLocalTime(item.latest_location.loc_time)]
                                 ].concat(temp)
                             };
-
+                            that.data.selectCarStartDatetime = Commonfun.getStartTime(new Date(item.latest_location.loc_time * 1000));
                             // 从localstorage中获取应该显示到列表中的字段，entitydesc或者entityname
                             let entityOption = localStorage['entityOption' + that.data.serviceId];
                             if (entityOption === 'byname' || entityOption === undefined) {
@@ -838,6 +838,10 @@ var TrackStore = Reflux.createStore({
                             if (++that.data.tracklistloadedConunt === that.data.trackListSize) {
                                 that.trigger('tracklistloaded');
                                 that.data.tracklistloadedConunt = 0;
+                                if (that.data.triggerselecttrack) {
+                                    that.trigger('triggerselecttrack');
+                                    that.data.triggerselecttrack = false;
+                                }
                             }
                         } else if (datad.status === 3006 || datad.status === 1) {
 
@@ -882,6 +886,10 @@ var TrackStore = Reflux.createStore({
                                             if (++that.data.tracklistloadedConunt === that.data.trackListSize) {
                                                 that.trigger('tracklistloaded');
                                                 that.data.tracklistloadedConunt = 0;
+                                                if (that.data.triggerselecttrack) {
+                                                    that.trigger('triggerselecttrack');
+                                                    that.data.triggerselecttrack = false;
+                                                }                
                                             }
                                         }
                                     }
@@ -1316,6 +1324,44 @@ var TrackStore = Reflux.createStore({
             let infoBoxObject = that.getTrackPointInfo(data, point);
             that.trigger('getaddress', infoBoxObject);
         });
+    },
+
+    /**
+     * 响应Action triggerswitchmanagetab
+     * 传递模拟点击实时监控和轨迹查询的页签
+     *
+     * @param {number} index 序号
+     */
+    onTriggerswitchmanagetab(index) {
+        this.trigger('triggerswitchmanagetab', index);
+    },
+
+    /**
+     * 响应Action triggersearchentitytrack
+     * 传递模拟轨迹查询页面的检索
+     *
+     */
+    onTriggersearchentitytrack() {
+        this.trigger('triggersearchentitytrack', this.data.selectCar);
+    },
+
+    /**
+     * 响应Action triggersetdate
+     * 传递模拟轨迹查询页面的检索
+     *
+     */
+    onTriggersetdate() {
+        this.trigger('triggersetdate', this.data.selectCarStartDatetime);
+    },
+
+
+    /**
+     * 响应Action triggerselecttrack
+     * 传递模拟选择某个轨迹
+     *
+     */
+    onTriggerselecttrack() {
+        this.data.triggerselecttrack = true;
     },
 
     /**

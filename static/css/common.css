@@ -1147,20 +1147,30 @@ abbr{
     float: left;
 }
 
-.infoZoomIn{
-    display: none;
+.infoZoomIn,
+.infoGoTrack {
+    /*display: none;*/
     height: 100%;
     line-height: 40px;
     background-position: left center;
     background-repeat: no-repeat;
-    background-image: url('static/images/zoominicon.png');
     width: 35px;
     font-size: 12px;
     color: #666;
     cursor: pointer;
     float: right;
     text-align: left;
-    padding-left: 25px;
+    padding-left: 20px;
+}
+
+.infoZoomIn {
+    background-size: 15px 15px;
+    background-image: url(static/images/zoominicon.png);
+}
+
+.infoGoTrack {
+    background-size: 14px 18px;
+    background-image: url(static/images/gotrack_2x.png);
 }
 
 .trackSearch{

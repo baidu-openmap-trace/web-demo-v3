@@ -6,7 +6,7 @@
 [百度地图鹰眼轨迹管理台](http://lbsyun.baidu.com/index.php?title=yingyan/manage)  
 [百度地图鹰眼开发者社区](http://bbs.lbsyun.baidu.com/forum.php?mod=forumdisplay&fid=26)  
 
-##更新日志##
+##更新日志##  
 2016.11.21:修复城市列表控件位置错误导致不可见的bug  
 2016.11.28:修复bug，更新V3 search接口的返回字段  
 2016.12.08:修复查看entity实时监控详情的bug  
@@ -14,6 +14,7 @@
 2016.12.19:修复终端管理页面最后位置显示错误的bug  
 2016.12.27:修正了script/modules/trackcontrol/views/trackcontent.js的中文注释乱码  
 2017.04.16:本次更新的项目很多，版本整体升级到了v3.2版本，功能上主要增加了：切换所有的接口为鹰眼Web API V3接口、添加动态查看视野范围内所有设备、支持拖动时间轴卡尺灵活查看轨迹、添加轨迹绑路交通方式选项、优化了历史轨迹的显示样式、支持历史轨迹点点击查看详细信息等等。可以参考这个帖子：http://bbs.lbsyun.baidu.com/forum.php?mod=viewthread&tid=119502&extra=page%3D1&page=1  
+
 **2017.10.12**:本次更新升级了bootstrap版本，将原项目中的bootstrap2.x升级到3.x最新版本，避免在java项目中集成时bootstrap版本冲突的问题，并解决升级后翻页按钮显示错位的问题
 
 > java集成注意事项
@@ -29,7 +30,8 @@ if (location.href.indexOf('/manager') > -1) {
 }
 ```
 
-       
+2017.11.20:添加点击实时位置信息窗中 轨迹 按钮，直接跳转到上一条历史轨迹的功能，修复了轨迹抖动的bug 
+    
 ## 参考文档
 ###目录###
 >[1 前言](#1)  

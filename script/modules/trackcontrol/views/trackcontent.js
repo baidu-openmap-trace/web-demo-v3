@@ -57,7 +57,24 @@ var Trackcontent = React.createClass({
             case 'getaddress':
                 this.listenGetaddress(data);
                 break;
+            case 'triggerselecttrack':
+                this.listenTriggerSelectTrack();
+                break;
+
         }
+    },
+
+    /**
+     * 响应store triggerselecttrack 自动触发点击第一条记录
+     *
+     */
+    listenTriggerSelectTrack() {
+        const entity_name = this.state.trackList[0].name;
+        const entity_print = this.state.trackList[0].print;
+        const entity_id = this.state.trackList[0].entity_id;
+        this.setState({currentEntityName: entity_name});
+        this.setState({currentEntityPrint: entity_print});
+        TrackAction.selecttrack(entity_name, entity_id);
     },
 
     /**
