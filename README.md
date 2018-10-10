@@ -174,7 +174,7 @@ stores中接受views触发的actions，执行响应的操作。并触发回调�
 <h3 id="4"> LICENSE</h3>
 MIT License
 
-Copyright (c) 2017 Baidu Inc.
+Copyright (c) 2018 Baidu Inc.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
