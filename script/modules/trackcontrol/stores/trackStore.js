@@ -844,7 +844,6 @@ var TrackStore = Reflux.createStore({
                                 }
                             }
                         } else if (datad.status === 3006 || datad.status === 1) {
-
                             var tempTimeArr = [];
                             var partTime = Math.floor((that.data.end_time - that.data.start_time) / 6);
                             for(var i = 0; i < 6; i++) {
@@ -871,6 +870,7 @@ var TrackStore = Reflux.createStore({
                                                      'transport_mode=' + that.data.transport_mode[that.data.trackProcess.transport_mode - 1]
                                 };
                                 Urls.jsonp(Urls.getDistance, param_time, function(data_time) {
+                                    let key = item.entity_name;
                                     if (data_time.status === 0) {
                                         if (!distance_time[key]) {
                                             distance_time[key] = {};
