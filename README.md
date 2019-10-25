@@ -14,9 +14,24 @@
 2016.12.19:修复终端管理页面最后位置显示错误的bug  
 2016.12.27:修正了script/modules/trackcontrol/views/trackcontent.js的中文注释乱码  
 2017.04.16:本次更新的项目很多，版本整体升级到了v3.2版本，功能上主要增加了：切换所有的接口为鹰眼Web API V3接口、添加动态查看视野范围内所有设备、支持拖动时间轴卡尺灵活查看轨迹、添加轨迹绑路交通方式选项、优化了历史轨迹的显示样式、支持历史轨迹点点击查看详细信息等等。可以参考这个帖子：http://bbs.lbsyun.baidu.com/forum.php?mod=viewthread&tid=119502&extra=page%3D1&page=1  
-2017.11.20:添加点击实时位置信息窗中 轨迹 按钮，直接跳转到上一条历史轨迹的功能，修复了轨迹抖动的bug  
 
-       
+**2017.10.12**:本次更新升级了bootstrap版本，将原项目中的bootstrap2.x升级到3.x最新版本，避免在java项目中集成时bootstrap版本冲突的问题，并解决升级后翻页按钮显示错位的问题
+
+> java集成注意事项
+
+`script\modules\common\views\manager_content.js`中关于访问url有所控制，一般集成都是这个地方判断不对导致地图显示不出来。
+
+```
+if (location.href.indexOf('/manager') > -1) {
+    render(
+      <ManagerContent />,
+      $('#Manager_content')[0]
+    );
+}
+```
+
+2017.11.20:添加点击实时位置信息窗中 轨迹 按钮，直接跳转到上一条历史轨迹的功能，修复了轨迹抖动的bug 
+    
 ## 参考文档
 ###目录###
 >[1 前言](#1)  
@@ -60,7 +75,7 @@
 序号   | 名称           | 用途       
 ----- | -------------  | --------- 
 1     | [Jquery](http://jquery.com/)                                                      | DOM操作 
-2     | [Bootstrap](http://v2.bootcss.com/)                                               | CSS样式    
+2     | [Bootstrap](http://v3.bootcss.com/)                                               | CSS样式    
 3     | [Bootstrap-datetimepicker](https://github.com/smalot/bootstrap-datetimepicker)    | 日期选择插件   
 4     | [normalize.css](http://necolas.github.io/normalize.css/)                          | CSS样式初始化 
 5     | [animate.css](https://daneden.github.io/animate.css/)                             | CSS3 动画   
