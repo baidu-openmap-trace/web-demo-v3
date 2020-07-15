@@ -14,7 +14,7 @@ var urls = {
     // 获取自定义字段列表
     columnsList: '//yingyan.baidu.com/api/v3/entity/listcolumn',
     // 经纬度解析
-    getAddress: '//api.map.baidu.com/geocoder/v2/',
+    getAddress: '//api.map.baidu.com/reverse_geocoding/v3/',
     // 通过新的search接口获取数据，包括所有entity、模糊搜索entity、在线entity、离线entity
     searchEntity: '//yingyan.baidu.com/api/v3/entity/search',
     // 获取track列表
